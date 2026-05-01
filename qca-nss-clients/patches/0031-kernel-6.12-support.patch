@@ -1,8 +1,9 @@
 --- a/Makefile
 +++ b/Makefile
-@@ -10,6 +10,9 @@ qca-nss-tun6rd-objs := nss_connmgr_tun6r
+@@ -10,6 +10,10 @@ qca-nss-tun6rd-objs := nss_connmgr_tun6r
  ccflags-y += -DNSS_TUN6RD_DEBUG_LEVEL=0
  ccflags-y += -Wall -Werror
++subdir-ccflags-y += $(EXTRA_CFLAGS)
  
 +# Kernel 6.12 compatibility
 +ccflags-y += -Wno-missing-prototypes -include $(src)/compat.h
@@ -77,7 +78,7 @@
  		dev->features |= NETIF_F_NETNS_LOCAL | NETIF_F_SG | NETIF_F_FRAGLIST | NETIF_F_HIGHDMA;
 +#else
 +		dev->features |= NETIF_F_SG | NETIF_F_FRAGLIST | NETIF_F_HIGHDMA;
-+		dev->netns_local = true;
++		dev->netns_immutable = true;
 +#endif
  		dev->hw_features |= NETIF_F_SG | NETIF_F_FRAGLIST | NETIF_F_HIGHDMA;
  		return 0;
@@ -89,7 +90,7 @@
 +#if LINUX_VERSION_CODE <= KERNEL_VERSION(6, 10, 0)
  	dev->features |= NETIF_F_NETNS_LOCAL;
 +#else
-+	dev->netns_local = true;
++	dev->netns_immutable = true;
 +#endif
  	return 0;
  }
@@ -821,7 +822,7 @@
  
 --- /dev/null
 +++ b/compat.h
-@@ -0,0 +1,15 @@
+@@ -0,0 +1,26 @@
 +// compat.h
 +#ifndef _COMPAT_H
 +#define _COMPAT_H
@@ -829,9 +830,20 @@
 +#include <linux/version.h>
 +
 +#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 10, 0)
++#include <linux/timer.h>
 +#include <linux/vmalloc.h>
 +#define compat_const const
 +#define strlcpy strscpy
++#ifndef from_timer
++#define from_timer(var, callback_timer, timer_fieldname) \
++	timer_container_of(var, callback_timer, timer_fieldname)
++#endif
++#ifndef del_timer
++#define del_timer timer_delete
++#endif
++#ifndef del_timer_sync
++#define del_timer_sync timer_delete_sync
++#endif
 +#else
 +#define compat_const
 +#endif

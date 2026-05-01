@@ -1,0 +1,7 @@
+--- a/Makefile
++++ b/Makefile
+@@ -1,3 +1,4 @@
+ obj-m += nss-ifb.o
+ 
++ccflags-y += $(EXTRA_CFLAGS)
+ nss-ifb-objs := nss_ifb.o

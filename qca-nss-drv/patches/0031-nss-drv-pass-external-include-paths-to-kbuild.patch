@@ -1,0 +1,11 @@
+--- a/Makefile
++++ b/Makefile
+@@ -3,6 +3,8 @@
+ 
+ obj-m += qca-nss-drv.o
+ 
++ccflags-y += $(NSS_DRV_EXTRA_INCLUDES)
++
+ #
+ # Regular NSS path
+ #

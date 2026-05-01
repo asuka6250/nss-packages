@@ -1,0 +1,8 @@
+--- a/ecm_db/ecm_db_timer.c
++++ b/ecm_db/ecm_db_timer.c
+@@ -521,5 +521,5 @@ void ecm_db_timer_exit(void)
+ 	 */
+
+-	del_timer_sync(&ecm_db_timer);
++	timer_delete_sync(&ecm_db_timer);
+ }

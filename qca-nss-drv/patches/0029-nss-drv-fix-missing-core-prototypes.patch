@@ -1,0 +1,882 @@
+--- a/nss_core.c
++++ b/nss_core.c
+@@ -389,7 +389,7 @@ void nss_core_unregister_subsys_dp(struc
+  * nss_core_handle_nss_status_pkt()
+  *	Handle the metadata/status packet.
+  */
+-void nss_core_handle_nss_status_pkt(struct nss_ctx_instance *nss_ctx, struct sk_buff *nbuf)
++static void nss_core_handle_nss_status_pkt(struct nss_ctx_instance *nss_ctx, struct sk_buff *nbuf)
+ {
+ 	struct nss_cmn_msg *ncm;
+ 	uint32_t expected_version = NSS_HLOS_MESSAGE_VERSION;
+@@ -2759,7 +2759,7 @@ static bool nss_core_skb_can_reuse(struc
+  * NOTE: This function does any necessary reference count dropping, and
+  * cleans up the skbuff as if its allocated fresh.
+  */
+-void nss_skb_reuse(struct sk_buff *nbuf)
++static void nss_skb_reuse(struct sk_buff *nbuf)
+ {
+ 	struct skb_shared_info *shinfo;
+ 
+--- a/nss_coredump.c
++++ b/nss_coredump.c
+@@ -114,8 +114,9 @@ static int nss_panic_handler(struct noti
+ 		}
+ 	} while (timed++ < nss_top_main.num_nss * 2);
+ 
+-	if (timed >= nss_top_main.num_nss * 2)
++	if (timed >= nss_top_main.num_nss * 2) {
+ 		nss_warning("might get %d FW dumped", dumped);
++	}
+ 
+ 	return	NOTIFY_DONE;
+ }
+--- a/nss_drv_strings.c
++++ b/nss_drv_strings.c
+@@ -19,6 +19,7 @@
+ #include "nss_stats.h"
+ #include "nss_core.h"
+ #include "nss_strings.h"
++#include "nss_drv_strings.h"
+ 
+ /*
+  * nss_drv_strings_stats
+--- a/nss_dynamic_interface_log.c
++++ b/nss_dynamic_interface_log.c
+@@ -20,6 +20,7 @@
+  */
+ 
+ #include "nss_core.h"
++#include "nss_dynamic_interface_log.h"
+ 
+ /*
+  * nss_dynamic_interface_log_message_types_str
+--- a/nss_dynamic_interface_stats.c
++++ b/nss_dynamic_interface_stats.c
+@@ -19,6 +19,7 @@
+ 
+ #include "nss_tx_rx_common.h"
+ #include "nss_dynamic_interface.h"
++#include "nss_dynamic_interface_stats.h"
+ 
+ /*
+  * nss_dynamic_interface_type_names
+--- a/nss_log.c
++++ b/nss_log.c
+@@ -299,7 +299,7 @@ struct file_operations nss_logs_core_ops
+  * nss_debug_interface_set_callback()
+  *	Sets the callback
+  */
+-void nss_debug_interface_set_callback(nss_log_msg_callback_t cb, void *app_data)
++static void nss_debug_interface_set_callback(nss_log_msg_callback_t cb, void *app_data)
+ {
+ 	nss_debug_interface_cb = cb;
+ 	nss_debug_interface_app_data = app_data;
+--- a/exports/nss_n2h.h
++++ b/exports/nss_n2h.h
+@@ -442,6 +442,23 @@ struct nss_n2h_msg {
+  */
+ typedef void (*nss_n2h_msg_callback_t)(void *app_data, struct nss_n2h_msg *msg);
+ 
++/**
++ * nss_n2h_notify_register
++ *	Registers to receive N2H events.
++ *
++ * @datatypes
++ * nss_ctx_instance \n
++ * nss_n2h_msg_callback_t
++ *
++ * @param[in] core      NSS core number.
++ * @param[in] cb        Callback function for N2H notifications.
++ * @param[in] app_data  Pointer to the application context of the message.
++ *
++ * @return
++ * Pointer to the NSS core context, or NULL on failure.
++ */
++extern struct nss_ctx_instance *nss_n2h_notify_register(int core, nss_n2h_msg_callback_t cb, void *app_data);
++
+ /**
+  * nss_n2h_tx_msg
+  *	Sends messages to the N2H package.
+--- a/nss_n2h_strings.c
++++ b/nss_n2h_strings.c
+@@ -20,6 +20,7 @@
+ #include "nss_core.h"
+ #include <nss_n2h.h>
+ #include "nss_strings.h"
++#include "nss_n2h_strings.h"
+ 
+ /*
+  * nss_n2h_strings_stats
+--- a/nss_rps.c
++++ b/nss_rps.c
+@@ -610,7 +610,7 @@ static struct ctl_table_header *nss_rps_
+  * nss_rps_pri_map_init_handler()
+  *	Initialize pri_map for priority based rps selection.
+  */
+-void nss_rps_pri_map_init_handler(void)
++static void nss_rps_pri_map_init_handler(void)
+ {
+ 	int i;
+ 
+--- a/nss_stats.h
++++ b/nss_stats.h
+@@ -72,6 +72,7 @@ extern void nss_stats_register_sysctl(vo
+ void nss_stats_init(void);
+ extern int nss_stats_release(struct inode *inode, struct file *filp);
+ extern int nss_stats_open(struct inode *inode, struct file *filp);
++extern ssize_t nss_clear_stats_write(struct file *fp, const char __user *ubuf, size_t sz, loff_t *ppos);
+ void nss_stats_create_dentry(char *name, const struct file_operations *ops);
+ extern void nss_stats_reset_common_stats(uint32_t if_num);
+ extern size_t nss_stats_fill_common_stats(uint32_t if_num, int instance, char *lbuf, size_t size_wr, size_t size_al, char *node);
+--- a/nss_unaligned_log.c
++++ b/nss_unaligned_log.c
+@@ -20,6 +20,7 @@
+  */
+ 
+ #include "nss_core.h"
++#include "nss_unaligned_log.h"
+ 
+ /*
+  * nss_unaligned_log_message_types_str
+--- a/exports/nss_if.h
++++ b/exports/nss_if.h
+@@ -303,6 +303,17 @@ extern struct nss_ctx_instance *nss_if_r
+ 					nss_if_msg_callback_t msg_callback,
+ 					struct net_device *if_ctx);
+ 
++/**
++ * nss_if_unregister
++ *	Unregisters the NSS interface callback handlers.
++ *
++ * @param[in] if_num  NSS interface number.
++ *
++ * @return
++ * None.
++ */
++extern void nss_if_unregister(uint32_t if_num);
++
+ /**
+  * nss_if_tx_buf
+  *	Sends GMAC packets to a specific physical or virtual network interface.
+--- a/nss_if_log.c
++++ b/nss_if_log.c
+@@ -22,6 +22,7 @@
+  */
+ 
+ #include "nss_core.h"
++#include "nss_if_log.h"
+ 
+ /*
+  * nss_if_log_message_types_str
+--- a/nss_phys_if.h
++++ b/nss_phys_if.h
+@@ -211,6 +211,13 @@ struct nss_ctx_instance *nss_phys_if_reg
+ 					struct net_device *netdev,
+ 					uint32_t features);
+ 
++/**
++ * @brief Unregister GMAC packet/message callbacks.
++ *
++ * @param if_num GMAC i/f number
++ */
++void nss_phys_if_unregister(uint32_t if_num);
++
+ /**
+  * @brief Send GMAC packet
+  *
+--- a/nss_virt_if_stats.c
++++ b/nss_virt_if_stats.c
+@@ -133,7 +133,7 @@ static int32_t nss_virt_if_interface_sta
+  * nss_virt_if_stats_get()
+  *	Get virt_if base node stats or interface stats by interface number.
+  */
+-bool nss_virt_if_stats_get(struct nss_ctx_instance *nss_ctx, uint32_t if_num, void *stats, bool is_base)
++static bool nss_virt_if_stats_get(struct nss_ctx_instance *nss_ctx, uint32_t if_num, void *stats, bool is_base)
+ {
+ 	if (nss_virt_if_verify_if_num(if_num) == false) {
+ 		return false;
+--- a/nss_bridge_log.c
++++ b/nss_bridge_log.c
+@@ -20,6 +20,7 @@
+  */
+ 
+ #include "nss_core.h"
++#include "nss_bridge_log.h"
+ 
+ /*
+  * nss_bridge_log_message_types_str
+--- a/nss_wifi_ext_vdev_log.c
++++ b/nss_wifi_ext_vdev_log.c
+@@ -22,6 +22,7 @@
+  */
+ 
+ #include "nss_core.h"
++#include "nss_wifi_ext_vdev_log.h"
+ 
+ #define NSS_WIFI_EXT_VDEV_LOG_MESSAGE_TYPE_INDEX(type) ((type) - NSS_IF_MAX_MSG_TYPES)
+ 
+--- a/nss_wifi_mesh_log.c
++++ b/nss_wifi_mesh_log.c
+@@ -23,6 +23,7 @@
+ 
+ #include "nss_core.h"
+ #include "nss_wifi_mesh.h"
++#include "nss_wifi_mesh_log.h"
+ 
+ #define NSS_WIFI_MESH_LOG_MESSAGE_TYPE_INDEX(type) ((type) - NSS_IF_MAX_MSG_TYPES)
+ 
+--- a/nss_l2tpv2.c
++++ b/nss_l2tpv2.c
+@@ -31,7 +31,7 @@ static struct nss_l2tpv2_stats_session_d
+  * nss_l2tpv2_session_debug_stats_sync
+  *	Per session debug stats for l2tpv2
+  */
+-void nss_l2tpv2_session_debug_stats_sync(struct nss_ctx_instance *nss_ctx, struct nss_l2tpv2_sync_session_stats_msg *stats_msg, uint16_t if_num)
++static void nss_l2tpv2_session_debug_stats_sync(struct nss_ctx_instance *nss_ctx, struct nss_l2tpv2_sync_session_stats_msg *stats_msg, uint16_t if_num)
+ {
+ 	int i;
+ 	spin_lock_bh(&nss_l2tpv2_session_debug_stats_lock);
+--- a/nss_l2tpv2_log.c
++++ b/nss_l2tpv2_log.c
+@@ -20,6 +20,7 @@
+  */
+ 
+ #include "nss_core.h"
++#include "nss_l2tpv2_log.h"
+ 
+ /*
+  * nss_l2tpv2_log_message_types_str
+--- a/nss_l2tpv2_strings.c
++++ b/nss_l2tpv2_strings.c
+@@ -20,6 +20,7 @@
+ #include "nss_core.h"
+ #include <nss_l2tpv2.h>
+ #include "nss_strings.h"
++#include "nss_l2tpv2_strings.h"
+ 
+ /*
+  * nss_l2tpv2_strings_session_stats
+--- a/nss_lag.c
++++ b/nss_lag.c
+@@ -38,7 +38,7 @@ struct nss_lag_pvt {
+  * nss_lag_state_callback()
+  *	Call back function for nss LAG State
+  */
+-void nss_lag_state_callback(void *arg, struct nss_lag_msg *nm)
++static void nss_lag_state_callback(void *arg, struct nss_lag_msg *nm)
+ {
+ 	struct nss_lag_pvt *lag_msg_state = arg;
+ 
+@@ -142,7 +142,7 @@ EXPORT_SYMBOL(nss_unregister_lag_if);
+ /**
+  * nss_lag_handler()
+  */
+-void nss_lag_handler(struct nss_ctx_instance *nss_ctx,
++static void nss_lag_handler(struct nss_ctx_instance *nss_ctx,
+ 		     struct nss_cmn_msg *ncm,
+ 		     void *app_data)
+ {
+--- a/nss_lag_log.c
++++ b/nss_lag_log.c
+@@ -20,6 +20,7 @@
+  */
+ 
+ #include "nss_core.h"
++#include "nss_lag_log.h"
+ 
+ /*
+  * nss_lag_log_message_types_str
+--- a/exports/nss_ipv6.h
++++ b/exports/nss_ipv6.h
+@@ -1046,6 +1046,22 @@ extern int nss_ipv6_max_conn_count(void)
+  */
+ typedef void (*nss_ipv6_msg_callback_t)(void *app_data, struct nss_ipv6_msg *msg);
+ 
++/**
++ * nss_ipv6_conn_inquiry
++ *	Inquires whether an IPv6 connection has been established in NSS firmware.
++ *
++ * @datatypes
++ * nss_ipv6_5tuple \n
++ * nss_ipv6_msg_callback_t
++ *
++ * @param[in] ipv6_5t_p  Pointer to the IPv6 5-tuple.
++ * @param[in] cb         Callback function for the message response.
++ *
++ * @return
++ * Status of the Tx operation.
++ */
++extern nss_tx_status_t nss_ipv6_conn_inquiry(struct nss_ipv6_5tuple *ipv6_5t_p, nss_ipv6_msg_callback_t cb);
++
+ /**
+  * nss_ipv6_tx
+  *	Transmits an IPv6 message to the NSS.
+--- a/nss_ipv6_strings.c
++++ b/nss_ipv6_strings.c
+@@ -20,6 +20,7 @@
+ #include "nss_core.h"
+ #include <nss_ipv6.h>
+ #include "nss_strings.h"
++#include "nss_ipv6_strings.h"
+ 
+ /*
+  * nss_ipv6_strings_exception_stats
+--- a/nss_gre_log.c
++++ b/nss_gre_log.c
+@@ -20,6 +20,7 @@
+  */
+ 
+ #include "nss_core.h"
++#include "nss_gre_log.h"
+ 
+ #define NSS_GRE_LOG_MESSAGE_TYPE_INDEX(type) ((type) - NSS_IF_MAX_MSG_TYPES - 1)
+ 
+--- a/nss_gre_redir_log.c
++++ b/nss_gre_redir_log.c
+@@ -20,6 +20,7 @@
+  */
+ 
+ #include "nss_core.h"
++#include "nss_gre_redir_log.h"
+ 
+ /*
+  * nss_gre_redir_log_message_types_str
+--- a/nss_gre_redir_lag_ds_log.c
++++ b/nss_gre_redir_lag_ds_log.c
+@@ -20,6 +20,7 @@
+  */
+ 
+ #include "nss_core.h"
++#include "nss_gre_redir_lag_ds_log.h"
+ 
+ /*
+  * nss_gre_redir_lag_ds_log_message_types_str
+--- a/nss_gre_redir_lag_us_log.c
++++ b/nss_gre_redir_lag_us_log.c
+@@ -20,6 +20,7 @@
+  */
+ 
+ #include "nss_core.h"
++#include "nss_gre_redir_lag_us_log.h"
+ 
+ /*
+  * nss_gre_redir_lag_us_log_message_types_str
+--- a/nss_gre_redir_mark_log.c
++++ b/nss_gre_redir_mark_log.c
+@@ -15,6 +15,7 @@
+  */
+ 
+ #include "nss_core.h"
++#include "nss_gre_redir_mark_log.h"
+ 
+ /*
+  * nss_gre_redir_mark_log_message_types_str
+--- a/nss_map_t.c
++++ b/nss_map_t.c
+@@ -65,7 +65,7 @@ bool nss_map_t_verify_if_num(uint32_t if
+  * nss_map_t_instance_debug_stats_sync
+  *	debug stats for map_t
+  */
+-void nss_map_t_instance_debug_stats_sync(struct nss_ctx_instance *nss_ctx, struct nss_map_t_sync_stats_msg *stats_msg, uint16_t if_num)
++static void nss_map_t_instance_debug_stats_sync(struct nss_ctx_instance *nss_ctx, struct nss_map_t_sync_stats_msg *stats_msg, uint16_t if_num)
+ {
+ 	int i;
+ 	enum nss_dynamic_interface_type if_type;
+--- a/nss_map_t_log.c
++++ b/nss_map_t_log.c
+@@ -20,6 +20,7 @@
+  */
+ 
+ #include "nss_core.h"
++#include "nss_map_t_log.h"
+ 
+ /*
+  * nss_map_t_log_message_types_str
+--- a/nss_map_t_strings.c
++++ b/nss_map_t_strings.c
+@@ -20,6 +20,7 @@
+ #include "nss_core.h"
+ #include <nss_map_t.h>
+ #include "nss_strings.h"
++#include "nss_map_t_strings.h"
+ 
+ /*
+  * nss_map_t_strings_instance_stats
+--- a/nss_pptp.c
++++ b/nss_pptp.c
+@@ -43,7 +43,7 @@ static struct nss_pptp_pvt {
+  * nss_pptp_session_debug_stats_sync
+  *	Per session debug stats for pptp
+  */
+-void nss_pptp_session_debug_stats_sync(struct nss_ctx_instance *nss_ctx,
++static void nss_pptp_session_debug_stats_sync(struct nss_ctx_instance *nss_ctx,
+ 				struct nss_pptp_sync_session_stats_msg *stats_msg, uint16_t if_num)
+ {
+ 	int i, j, if_type;
+--- a/nss_pptp_log.c
++++ b/nss_pptp_log.c
+@@ -20,6 +20,7 @@
+  */
+ 
+ #include "nss_core.h"
++#include "nss_pptp_log.h"
+ 
+ /*
+  * nss_pptp_log_message_types_str
+--- a/nss_pptp_strings.c
++++ b/nss_pptp_strings.c
+@@ -20,6 +20,7 @@
+ #include "nss_core.h"
+ #include <nss_pptp.h>
+ #include "nss_strings.h"
++#include "nss_pptp_strings.h"
+ 
+ /*
+  * nss_pptp_strings_session_debug_stats
+--- a/nss_tun6rd_log.c
++++ b/nss_tun6rd_log.c
+@@ -20,6 +20,7 @@
+  */
+ 
+ #include "nss_core.h"
++#include "nss_tun6rd_log.h"
+ 
+ /*
+  * nss_tun6rd_log_message_types_str
+--- a/nss_tunipip6_log.c
++++ b/nss_tunipip6_log.c
+@@ -20,6 +20,7 @@
+  */
+ 
+ #include "nss_core.h"
++#include "nss_tunipip6_log.h"
+ 
+ /*
+  * nss_tunipip6_log_message_types_str
+--- a/exports/nss_vxlan.h
++++ b/exports/nss_vxlan.h
+@@ -343,6 +343,17 @@ extern struct nss_ctx_instance *nss_vxla
+ extern void nss_vxlan_msg_init(struct nss_vxlan_msg *nvm, uint16_t if_num, uint32_t type, uint32_t len,
+ 				nss_vxlan_msg_callback_t cb, void *app_data);
+ 
++/**
++ * nss_vxlan_ifnum_with_core_id()
++ *	Appends core ID to a VxLAN interface number.
++ *
++ * @param[in] if_num  NSS interface number.
++ *
++ * @return
++ * Interface number with core ID appended.
++ */
++extern int nss_vxlan_ifnum_with_core_id(int if_num);
++
+ /**
+  * nss_vxlan_get_ctx()
+  *	Get VxLAN context.
+--- a/nss_vxlan_log.c
++++ b/nss_vxlan_log.c
+@@ -20,6 +20,7 @@
+  */
+ 
+ #include "nss_core.h"
++#include "nss_vxlan_log.h"
+ 
+ /*
+  * nss_vxlan_log_message_types_str
+--- a/nss_match_log.c
++++ b/nss_match_log.c
+@@ -22,6 +22,7 @@
+  */
+ 
+ #include "nss_core.h"
++#include "nss_match_log.h"
+ 
+ /*
+  * nss_match_log_message_types_str
+--- a/nss_mirror_log.c
++++ b/nss_mirror_log.c
+@@ -22,6 +22,7 @@
+  */
+ 
+ #include "nss_core.h"
++#include "nss_mirror_log.h"
+ 
+ /*
+  * nss_mirror_log_message_types_str
+--- a/exports/nss_ipv4.h
++++ b/exports/nss_ipv4.h
+@@ -1053,6 +1053,18 @@ int nss_ipv4_max_conn_count(void);
+  */
+ typedef void (*nss_ipv4_msg_callback_t)(void *app_data, struct nss_ipv4_msg *msg);
+ 
++/**
++ * nss_ipv4_conn_inquiry
++ *	Inquires whether a connection has been established in NSS firmware.
++ *
++ * @param[in] ipv4_5t_p  Pointer to the IPv4 5-tuple.
++ * @param[in] cb         Callback function for the message.
++ *
++ * @return
++ * Status of the Tx operation.
++ */
++extern nss_tx_status_t nss_ipv4_conn_inquiry(struct nss_ipv4_5tuple *ipv4_5t_p, nss_ipv4_msg_callback_t cb);
++
+ /**
+  * nss_ipv4_tx
+  *	Transmits an IPv4 message to the NSS.
+--- a/nss_ipv4_strings.c
++++ b/nss_ipv4_strings.c
+@@ -20,6 +20,7 @@
+ #include "nss_core.h"
+ #include <nss_ipv4.h>
+ #include "nss_strings.h"
++#include "nss_ipv4_strings.h"
+ 
+ /*
+  * nss_ipv4_strings_exception_stats
+--- a/nss_eth_rx.c
++++ b/nss_eth_rx.c
+@@ -20,6 +20,7 @@
+  */
+ 
+ #include <nss_core.h>
++#include "nss_tx_rx_common.h"
+ #include "nss_eth_rx_stats.h"
+ #include "nss_eth_rx_strings.h"
+ 
+--- a/nss_eth_rx_strings.c
++++ b/nss_eth_rx_strings.c
+@@ -19,6 +19,7 @@
+ #include "nss_stats.h"
+ #include "nss_core.h"
+ #include "nss_strings.h"
++#include "nss_eth_rx_strings.h"
+ 
+ /*
+  * nss_eth_rx_strings_stats
+--- a/nss_pppoe.c
++++ b/nss_pppoe.c
+@@ -203,7 +203,7 @@ static void nss_pppoe_handler(struct nss
+  * nss_pppoe_br_accel_mode_handler()
+  *	Enable/disable pppoe bridge acceleration in NSS
+  */
+-int nss_pppoe_br_accel_mode_handler(compat_const struct ctl_table *ctl, int write, void __user *buffer, size_t *lenp, loff_t *ppos)
++static int nss_pppoe_br_accel_mode_handler(compat_const struct ctl_table *ctl, int write, void __user *buffer, size_t *lenp, loff_t *ppos)
+ {
+ 	struct nss_ctx_instance *nss_ctx = nss_pppoe_get_context();
+ 	struct nss_pppoe_msg npm;
+--- a/nss_pppoe_log.c
++++ b/nss_pppoe_log.c
+@@ -20,6 +20,7 @@
+  */
+ 
+ #include "nss_core.h"
++#include "nss_pppoe_log.h"
+ 
+ /*
+  * nss_pppoe_log_message_types_str
+--- a/nss_pppoe_strings.c
++++ b/nss_pppoe_strings.c
+@@ -20,6 +20,7 @@
+ #include "nss_core.h"
+ #include <nss_pppoe.h>
+ #include "nss_strings.h"
++#include "nss_pppoe_strings.h"
+ 
+ /*
+  * nss_pppoe_strings_session_stats
+--- a/exports/nss_wifili_if.h
++++ b/exports/nss_wifili_if.h
+@@ -2139,6 +2139,25 @@ extern nss_tx_status_t nss_wifili_tx_ms
+  */
+ extern nss_tx_status_t nss_wifili_tx_msg_sync(struct nss_ctx_instance *nss_ctx, struct nss_wifili_msg *msg);
+ 
++/**
++ * nss_wifili_msg_init
++ *	Initialize a wifili message.
++ *
++ * @datatypes
++ * nss_wifili_msg
++ *
++ * @param[in,out] ncm       Pointer to the Wi-Fi message.
++ * @param[in]     if_num    NSS interface number.
++ * @param[in]     type      Type of message.
++ * @param[in]     len       Size of the message.
++ * @param[in]     cb        Message callback.
++ * @param[in]     app_data  Application context of the message.
++ *
++ * @return
++ * void
++ */
++extern void nss_wifili_msg_init(struct nss_wifili_msg *ncm, uint16_t if_num, uint32_t type, uint32_t len, void *cb, void *app_data);
++
+ /**
+  * nss_wifili_msg_callback_t
+  *	Callback to receive wifili messages.
+--- a/nss_wifili_log.c
++++ b/nss_wifili_log.c
+@@ -20,6 +20,7 @@
+  */
+ 
+ #include "nss_core.h"
++#include "nss_wifili_log.h"
+ 
+ /*
+  * nss_wifili_log_message_types_str
+--- a/nss_wifili_stats.c
++++ b/nss_wifili_stats.c
+@@ -43,7 +43,7 @@ struct nss_wifili_soc_stats soc_stats[N
+  * nss_wifili_target_type_string()
+  *	Convert Target Type Integer to String
+  */
+-void nss_wifili_target_type_to_string(uint32_t target_type, char *target_type_str)
++static void nss_wifili_target_type_to_string(uint32_t target_type, char *target_type_str)
+ {
+ 	switch (target_type) {
+ 
+--- a/nss_wifi_mac_db.c
++++ b/nss_wifi_mac_db.c
+@@ -17,6 +17,7 @@
+  */
+ 
+ #include "nss_core.h"
++#include "nss_tx_rx_common.h"
+ #include "nss_wifi_mac_db_if.h"
+ 
+ /*
+--- a/nss_vlan_log.c
++++ b/nss_vlan_log.c
+@@ -20,6 +20,7 @@
+  */
+ 
+ #include "nss_core.h"
++#include "nss_vlan_log.h"
+ 
+ /*
+  * nss_vlan_log_message_types_str
+--- a/exports/nss_edma.h
++++ b/exports/nss_edma.h
+@@ -327,6 +327,15 @@ extern struct nss_ctx_instance *nss_edma
+  */
+ extern void nss_edma_notify_unregister(void);
+ 
++/**
++ * nss_edma_get_context
++ *	Gets the EDMA NSS context.
++ *
++ * @return
++ * Pointer to the EDMA NSS core context.
++ */
++extern struct nss_ctx_instance *nss_edma_get_context(void);
++
+ /**
+  * nss_edma_get_stats
+  *	Sends EDMA statistics to NSS clients.
+--- a/nss_edma.c
++++ b/nss_edma.c
+@@ -18,6 +18,7 @@
+  * nss_edma.c
+  *	NSS EDMA APIs
+  */
++#include "nss_tx_rx_common.h"
+ #include "nss_edma_stats.h"
+ #include "nss_edma_strings.h"
+ 
+--- a/nss_edma_strings.c
++++ b/nss_edma_strings.c
+@@ -18,6 +18,7 @@
+ #include "nss_core.h"
+ #include <nss_edma.h>
+ #include "nss_strings.h"
++#include "nss_edma_strings.h"
+ 
+ /*
+  * nss_edma_strings_stats_node
+--- a/nss_ppe_vp.c
++++ b/nss_ppe_vp.c
+@@ -277,7 +277,7 @@ static int32_t nss_ppe_vp_get_ifnum_by_
+  * nss_ppe_vp_tx_msg()
+  *	Transmit a ppe_vp message to NSS FW
+  */
+-nss_tx_status_t nss_ppe_vp_tx_msg(struct nss_ctx_instance *nss_ctx, struct nss_ppe_vp_msg *msg)
++static nss_tx_status_t nss_ppe_vp_tx_msg(struct nss_ctx_instance *nss_ctx, struct nss_ppe_vp_msg *msg)
+ {
+ 	struct nss_cmn_msg *ncm = &msg->cm;
+ 	nss_if_num_t if_num = ncm->interface;
+@@ -307,7 +307,7 @@ nss_tx_status_t nss_ppe_vp_tx_msg(struc
+  * nss_ppe_vp_tx_msg_sync()
+  *	Transmit a ppe_vp message to NSS firmware synchronously.
+  */
+-nss_tx_status_t nss_ppe_vp_tx_msg_sync(struct nss_ctx_instance *nss_ctx, struct nss_ppe_vp_msg *npvm)
++static nss_tx_status_t nss_ppe_vp_tx_msg_sync(struct nss_ctx_instance *nss_ctx, struct nss_ppe_vp_msg *npvm)
+ {
+ 	nss_tx_status_t status;
+ 	int ret = 0;
+@@ -777,7 +777,7 @@ static struct ctl_table_header *nss_ppe_
+  * nss_ppe_vp_procfs_register()
+  *	Register sysctl specific to ppe_vp
+  */
+-void nss_ppe_vp_procfs_register(void)
++static void nss_ppe_vp_procfs_register(void)
+ {
+ 	/*
+ 	 * Register sysctl table.
+@@ -789,7 +789,7 @@ void nss_ppe_vp_procfs_register(void)
+  * uss_ppe_vp_procfs_unregister()
+  *	Unregister sysctl specific for ppe_vp
+  */
+-void nss_ppe_vp_procfs_unregister(void)
++static void nss_ppe_vp_procfs_unregister(void)
+ {
+ 	/*
+ 	 * Unregister sysctl table.
+--- a/nss_tx_rx_common.h
++++ b/nss_tx_rx_common.h
+@@ -97,6 +97,7 @@ extern void nss_wifili_register_handler(
+ extern void nss_ppe_register_handler(void);
+ extern void nss_gre_redir_mark_register_handler(void);
+ extern void nss_ppe_vp_register_handler(void);
++extern void nss_ppe_vp_unregister_handler(void);
+ extern void nss_wifi_mac_db_register_handler(void);
+ extern void nss_wifi_ext_vdev_register_handler(void);
+ extern void nss_wifili_thread_scheme_db_init(uint8_t core_id);
+--- a/nss_crypto_cmn_log.c
++++ b/nss_crypto_cmn_log.c
+@@ -20,6 +20,7 @@
+  */
+ 
+ #include "nss_core.h"
++#include "nss_crypto_cmn_log.h"
+ 
+ /*
+  * nss_crypto_cmn_log_message_types_str
+--- a/nss_dma_log.c
++++ b/nss_dma_log.c
+@@ -22,6 +22,7 @@
+  */
+ 
+ #include "nss_core.h"
++#include "nss_dma_log.h"
+ 
+ /*
+  * nss_dma_log_message_types_str
+@@ -61,7 +62,7 @@ static void nss_dma_configure_msg(struct
+ static void nss_dma_test_perf_msg(struct nss_dma_msg *ndm)
+ {
+ 	struct nss_dma_test_cfg *ndtc = &ndm->msg.test_cfg;
+-	struct nss_cmn_node_stats *ncns = &ndtc->node_stats;
++	struct nss_cmn_node_stats *ncns __maybe_unused = &ndtc->node_stats;
+ 
+ 	nss_trace("%px: NSS DMA test perf message: \n",ndm);
+ 	nss_trace("%px: processed (TX: %u, RX:%u, time:%u)\n", ndm, ncns->tx_packets, ncns->rx_packets, ndtc->time_delta);
+--- a/nss_dma_strings.c
++++ b/nss_dma_strings.c
+@@ -20,6 +20,7 @@
+ #include "nss_core.h"
+ #include "nss_strings.h"
+ #include "nss_dma_stats.h"
++#include "nss_dma_strings.h"
+ 
+ /*
+  * nss_dma_strings_stats
+--- a/nss_hal/ipq60xx/nss_hal_pvt.c
++++ b/nss_hal/ipq60xx/nss_hal_pvt.c
+@@ -722,7 +722,7 @@ int __nss_hal_request_irq(struct nss_ctx
+ /*
+  * __nss_hal_init_imem
+  */
+-void __nss_hal_init_imem(struct nss_ctx_instance *nss_ctx)
++static void __nss_hal_init_imem(struct nss_ctx_instance *nss_ctx)
+ {
+ 	/*
+ 	 * Nothing to be done as there are no TCM in ipq60xx
+@@ -732,7 +732,7 @@ void __nss_hal_init_imem(struct nss_ctx_
+ /*
+  * __nss_hal_init_utcm_shared
+  */
+-bool __nss_hal_init_utcm_shared(struct nss_ctx_instance *nss_ctx, uint32_t *meminfo_start)
++static bool __nss_hal_init_utcm_shared(struct nss_ctx_instance *nss_ctx, uint32_t *meminfo_start)
+ {
+	struct nss_meminfo_ctx *mem_ctx = &nss_ctx->meminfo_ctx;
+	uint32_t utcm_shared_map_magic = meminfo_start[2];
+--- a/nss_hal/ipq807x/nss_hal_pvt.c
++++ b/nss_hal/ipq807x/nss_hal_pvt.c
+@@ -765,7 +765,7 @@ int __nss_hal_request_irq(struct nss_ctx
+ /*
+  * __nss_hal_init_imem
+  */
+-void __nss_hal_init_imem(struct nss_ctx_instance *nss_ctx)
++static void __nss_hal_init_imem(struct nss_ctx_instance *nss_ctx)
+ {
+ 	struct nss_meminfo_ctx *mem_ctx = &nss_ctx->meminfo_ctx;
+ 
+@@ -780,7 +780,7 @@ void __nss_hal_init_imem(struct nss_ctx_
+ /*
+  * __nss_hal_init_utcm_shared
+  */
+-bool __nss_hal_init_utcm_shared(struct nss_ctx_instance *nss_ctx, uint32_t *meminfo_start)
++static bool __nss_hal_init_utcm_shared(struct nss_ctx_instance *nss_ctx, uint32_t *meminfo_start)
+ {
+ 	/*
+ 	 * Nothing to be done as there are no TCM in ipq807x
+--- a/nss_freq.c
++++ b/nss_freq.c
+@@ -202,7 +202,7 @@ static void nss_freq_compute_cpu_utiliza
+  * nss_freq_scale_frequency()
+  * 	Frequency scaling algorithm to scale frequency.
+  */
+-void nss_freq_scale_frequency(struct nss_ctx_instance *nss_ctx, uint32_t inst_cnt)
++static void nss_freq_scale_frequency(struct nss_ctx_instance *nss_ctx, uint32_t inst_cnt)
+ {
+ 	uint32_t b_index;
+ 	uint32_t minimum;
+--- a/exports/nss_freq.h
++++ b/exports/nss_freq.h
+@@ -47,6 +47,15 @@
+  */
+ nss_tx_status_t nss_freq_change(struct nss_ctx_instance *nss_ctx, uint32_t eng, uint32_t stats_enable, uint32_t start_or_end);
+ 
++/**
++ * nss_freq_get_context
++ *	Gets the NSS frequency context.
++ *
++ * @return
++ * Pointer to the NSS frequency context.
++ */
++extern struct nss_ctx_instance *nss_freq_get_context(void);
++
+ /**
+  * nss_freq_get_cpu_usage
+ *	Returns the CPU usage value in percentage at any instance for a required core. Range of usage is 0-100.
+--- a/nss_freq_log.c
++++ b/nss_freq_log.c
+@@ -20,6 +20,7 @@
+  */
+ 
+ #include "nss_core.h"
++#include "nss_freq_log.h"
+ 
+ /*
+  * nss_freq_log_message_types_str
+--- a/nss_freq_stats.c
++++ b/nss_freq_stats.c
+@@ -24,6 +24,7 @@
+ 
+ #include "nss_stats.h"
+ #include "nss_tx_rx_common.h"
++#include "nss_freq_stats.h"
+ 
+ /*
+  * At any point, this object has the latest data about CPU utilization.
+--- a/nss_init.c
++++ b/nss_init.c
+@@ -142,6 +142,7 @@ extern struct of_device_id nss_dt_ids[];
+ struct of_device_id nss_dt_ids[] = {
+ 	{ .compatible = "qcom,nss" },
+ 	{ .compatible = "qcom,nss0" },
+ 	{ .compatible = "qcom,nss1" },
++	{ }
+ };
+ MODULE_DEVICE_TABLE(of, nss_dt_ids);
+ #endif

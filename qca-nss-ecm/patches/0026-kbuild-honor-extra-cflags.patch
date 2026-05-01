@@ -1,0 +1,11 @@
+--- a/Makefile
++++ b/Makefile
+@@ -1,6 +1,8 @@
+ # ###################################################
+ # Makefile for the QCA NSS ECM
+ # ###################################################
++
++subdir-ccflags-y += $(EXTRA_CFLAGS)
+ ifeq ($(ECM_FRONT_END_SFE_ENABLE), y)
+ obj-m += examples/ecm_sfe_l2.o
+ endif
