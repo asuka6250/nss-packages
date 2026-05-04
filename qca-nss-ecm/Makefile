@@ -25,12 +25,12 @@ define KernelPackage/qca-nss-ecm
   SECTION:=kernel
   CATEGORY:=Kernel modules
   SUBMENU:=Network Support
-  DEPENDS:=@(TARGET_qualcommbe||TARGET_qualcommax||TARGET_ipq806x) \
+  DEPENDS:=@TARGET_qualcommax \
 		   +ethtool \
 		   +kmod-nf-conntrack \
-		   +@(TARGET_qualcommax||TARGET_ipq806x):NSS_DRV_IPV6_ENABLE \
-		   +@(TARGET_qualcommax||TARGET_ipq806x):NSS_DRV_VIRT_IF_ENABLE \
-		   +@((TARGET_qualcommax||TARGET_ipq806x)&&PACKAGE_kmod-pppoe):NSS_DRV_PPPOE_ENABLE \
+		   +@NSS_DRV_IPV6_ENABLE \
+		   +@NSS_DRV_VIRT_IF_ENABLE \
+		   +@(PACKAGE_kmod-pppoe):NSS_DRV_PPPOE_ENABLE \
 		   +PACKAGE_kmod-qca-nss-drv:kmod-qca-nss-drv \
 		   +PACKAGE_kmod-qca-mcs:kmod-qca-mcs \
 		   +PACKAGE_kmod-bonding:kmod-bonding \
@@ -97,9 +97,6 @@ ifneq ($(CONFIG_PACKAGE_kmod-qca-nss-drv-igs),)
 ECM_MAKE_OPTS+=ECM_CLASSIFIER_DSCP_IGS=y
 endif
 
-ifneq ($(CONFIG_PACKAGE_kmod-qca-nss-drv-ovpn-link),)
-ECM_MAKE_OPTS+=ECM_INTERFACE_OVPN_ENABLE=y
-endif
 
 ifeq ($(CONFIG_PACKAGE_kmod-vxlan),y)
 ECM_MAKE_OPTS+=ECM_INTERFACE_VXLAN_ENABLE=y
@@ -156,9 +153,6 @@ ifneq ($(CONFIG_PACKAGE_kmod-ip6-tunnel),)
 ECM_MAKE_OPTS+=ECM_INTERFACE_TUNIPIP6_ENABLE=y
 endif
 
-ifneq ($(CONFIG_PACKAGE_kmod-qca-nss-drv-mscs),)
-ECM_MAKE_OPTS+=ECM_CLASSIFIER_MSCS_ENABLE=y
-endif
 
 ifneq ($(CONFIG_PACKAGE_kmod-bonding),)
 ECM_MAKE_OPTS+=ECM_INTERFACE_BOND_ENABLE=y

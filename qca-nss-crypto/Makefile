@@ -20,7 +20,7 @@ define KernelPackage/qca-nss-crypto
 	SECTION:=kernel
 	CATEGORY:=Kernel modules
 	SUBMENU:=Cryptographic API modules
-	DEPENDS:=@(TARGET_qualcommax||TARGET_ipq806x) \
+	DEPENDS:=@TARGET_qualcommax \
 		+kmod-qca-nss-drv \
 		+@NSS_DRV_CRYPTO_ENABLE \
 		+TARGET_qualcommax_ipq807x:nss-eip-firmware \

@@ -34,33 +34,10 @@ config NSS_DRV_BRIDGE_ENABLE
 	prompt "Enable BRIDGE"
 	depends on TARGET_qualcommax_ipq807x || TARGET_qualcommax_ipq60xx
 
-config NSS_DRV_CAPWAP_ENABLE
-	bool
-	default n
-	prompt "Enable CAPWAP"
-	depends on TARGET_qualcommax_ipq807x || TARGET_qualcommax_ipq60xx
-
-config NSS_DRV_C2C_ENABLE
-	bool
-	default n
-	prompt "Enable C2C"
-	depends on TARGET_ipq806x || TARGET_qualcommax_ipq807x
-
-config NSS_DRV_CLMAP_ENABLE
-	bool
-	default n
-	prompt "Enable CLMAP"
-
 config NSS_DRV_CRYPTO_ENABLE
 	bool
 	default n
 	prompt "Enable CRYPTO"
-
-config NSS_DRV_DTLS_ENABLE
-	bool
-	default n
-	prompt "Enable DTLS"
-	depends on TARGET_qualcommax_ipq807x || TARGET_qualcommax_ipq60xx
 
 config NSS_DRV_GRE_ENABLE
 	bool
@@ -83,11 +60,6 @@ config NSS_DRV_IGS_ENABLE
 	bool
 	default n
 	prompt "Enable IGS"
-
-config NSS_DRV_IPSEC_ENABLE
-	bool
-	default n
-	prompt "Enable IPSEC"
 
 config NSS_DRV_IPV4_REASM_ENABLE
 	bool
@@ -131,18 +103,6 @@ config NSS_DRV_MIRROR_ENABLE
 	default n
 	prompt "Enable MIRROR"
 
-config NSS_DRV_OAM_ENABLE
-	bool
-	default n
-	prompt "Enable OAM"
-	depends on TARGET_ipq806x
-
-config NSS_DRV_PORTID_ENABLE
-	bool
-	default n
-	prompt "Enable PORTID"
-	depends on TARGET_ipq806x
-
 config NSS_DRV_LSO_RX_ENABLE
 	bool
 	default n
@@ -158,22 +118,11 @@ config NSS_DRV_PPTP_ENABLE
 	default n
 	prompt "Enable PPTP"
 
-config NSS_DRV_PVXLAN_ENABLE
-	bool
-	default n
-	prompt "Enable PVXLAN"
-
 config NSS_DRV_QRFS_ENABLE
 	bool
 	default n
 	prompt "Enable QRFS"
 	depends on TARGET_qualcommax_ipq807x
-
-config NSS_DRV_QVPN_ENABLE
-	bool
-	default n
-	prompt "Enable OpenVpn (QVPN)"
-	depends on TARGET_qualcommax_ipq807x || TARGET_qualcommax_ipq60xx
 
 config NSS_DRV_RMNET_ENABLE
 	bool
@@ -191,12 +140,6 @@ config NSS_DRV_SJACK_ENABLE
 	default n
 	prompt "Enable SJACK"
 
-config NSS_DRV_TLS_ENABLE
-	bool
-	default n
-	prompt "Enable TLS"
-	depends on TARGET_qualcommax_ipq807x || TARGET_qualcommax_ipq60xx
-
 config NSS_DRV_TRUSTSEC_ENABLE
 	bool
 	default n
@@ -213,12 +156,6 @@ config NSS_DRV_TRUSTSEC_RX_ENABLE
 	default n
 	prompt "Enable TRUSTSEC_RX"
 	depends on NSS_DRV_TRUSTSEC_ENABLE
-
-config NSS_DRV_TSTAMP_ENABLE
-	bool
-	default n
-	prompt "Enable TSTAMP"
-	depends on TARGET_ipq806x
 
 config NSS_DRV_TUN6RD_ENABLE
 	bool
@@ -263,9 +200,4 @@ config NSS_DRV_WIFI_MESH_ENABLE
 	depends on NSS_DRV_WIFIOFFLOAD_ENABLE
 	prompt "Enable WIFI MESH"
 
-config NSS_DRV_WIFI_LEGACY_ENABLE
-	bool
-	default n
-	depends on TARGET_ipq806x
-	prompt "Enable Legacy WIFI"
 endmenu
