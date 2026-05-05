@@ -29,38 +29,38 @@ STRIP:=:
 NSS_PROFILE:=R
 
 define Package/nss-firmware-common
-	TITLE:=NSS firmware
-	SECTION:=firmware
-	CATEGORY:=Firmware
-	URL:=$(PKG_SOURCE_URL)
-	DEPENDS:=@TARGET_qualcommax
+  TITLE:=NSS firmware
+  SECTION:=firmware
+  CATEGORY:=Firmware
+  URL:=$(PKG_SOURCE_URL)
+  DEPENDS:=@TARGET_qualcommax
 endef
 
 define Package/nss-firmware
 $(call Package/nss-firmware-common,$(1))
-	DEPENDS+= +TARGET_qualcommax_ipq807x:nss-firmware-ipq807x \
-		  +TARGET_qualcommax_ipq60xx:nss-firmware-ipq60xx \
-		  +TARGET_qualcommax_ipq50xx:nss-firmware-ipq50xx
+  DEPENDS+= +TARGET_qualcommax_ipq807x:nss-firmware-ipq807x \
+    +TARGET_qualcommax_ipq60xx:nss-firmware-ipq60xx \
+    +TARGET_qualcommax_ipq50xx:nss-firmware-ipq50xx
 endef
 
 define Package/nss-firmware-ipq807x
 $(call Package/nss-firmware-common,$(1))
-	IPQ_PLATFORM=IPQ8074
-	NSS_SOC:=HK
+  IPQ_PLATFORM=IPQ8074
+  NSS_SOC:=HK
 endef
 
 define Package/nss-firmware-ipq60xx
 $(call Package/nss-firmware-common,$(1))
-	IPQ_PLATFORM=IPQ6018
-	CONFLICTS=nss-firmware-ipq807x
-	NSS_SOC:=CP
+  IPQ_PLATFORM=IPQ6018
+  CONFLICTS=nss-firmware-ipq807x
+  NSS_SOC:=CP
 endef
 
 define Package/nss-firmware-ipq50xx
 $(call Package/nss-firmware-common,$(1))
-	IPQ_PLATFORM=IPQ5018
-	CONFLICTS=nss-firmware-ipq807x nss-firmware-ipq60xx
-	NSS_SOC:=MP
+  IPQ_PLATFORM=IPQ5018
+  CONFLICTS=nss-firmware-ipq807x nss-firmware-ipq60xx
+  NSS_SOC:=MP
 endef
 
 define Package/nss-firmware/config

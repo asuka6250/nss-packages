@@ -79,14 +79,6 @@
  				 int(*okfn)(struct sk_buff *));
 --- a/mc_snooping.c
 +++ b/mc_snooping.c
-@@ -15,6 +15,7 @@
-  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
-  */
- 
-+#include <linux/version.h>
- #include <linux/kernel.h>
- #include <linux/init.h>
- #include <linux/spinlock.h>
 @@ -28,7 +29,11 @@
  #include <linux/etherdevice.h>
  #include <linux/rculist.h>

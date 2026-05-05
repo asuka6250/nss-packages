@@ -153,7 +153,7 @@ Signed-off-by: Ansuel Smith <ansuelsmth@gmail.com>
  # support for the database keeping lists of connections that are assigned
  # on a per TYPE of classifier basis.
  # #############################################################################
--ECM_DB_CLASSIFIER_TYPE_ASSIGNMENTS_TRACK_ENABLE=y
+-ECM_DB_CLASSIFIER_TYPE_ASSIGNMENTS_TRACK_ENABLE=n
 +ifndef $(ECM_DB_CLASSIFIER_TYPE_ASSIGNMENTS_TRACK_ENABLE)
 +	ECM_DB_CLASSIFIER_TYPE_ASSIGNMENTS_TRACK_ENABLE=y
 +endif

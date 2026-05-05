@@ -9,6 +9,80 @@
  						if (mc->started)
  							mod_timer(&mc->qtimer, jiffies + mc->local_query_interval);
  					}
+--- a/mc_wifi_events.c
++++ b/mc_wifi_events.c
+@@ -24,6 +24,7 @@
+ #include "mc_netlink.h"
+ #include "mc_snooping.h"
+ #include "mc_forward.h"
++#include "mc_wifi_events.h"
+ #include <linux/in6.h>
+ 
+ struct sta_leave_event {
+@@ -81,7 +82,7 @@ static int mc_event_recv(struct socket *
+  * mc_sta_leave_event()
+  *	Delete the mac entry of sta from bridge snooping table
+  */
+-void mc_sta_leave_event(struct net_device *dev,__u8 *from_mac)
++static void mc_sta_leave_event(struct net_device *dev,__u8 *from_mac)
+ {
+ 
+ 	struct mc_struct *mc;
+@@ -154,7 +155,7 @@ void mc_sta_leave_event(struct net_devic
+  * mc_process_sta_leave_event()
+  * 	Parse and process sta_leave event
+  */
+-void mc_process_sta_leave_event(struct nlmsghdr *nlh, int cmd)
++static void mc_process_sta_leave_event(struct nlmsghdr *nlh, int cmd)
+ {
+ 	struct nlattr **tb = NULL;
+ 	uint8_t mac[ETH_ALEN] = {0};
+@@ -438,7 +439,7 @@ static void mc_handle_vbss_event(struct
+ /* mc_process_vendor_event()
+  *	Process the vendor events
+  */
+-void mc_process_vendor_event(struct nlmsghdr *nlh, int cmd)
++static void mc_process_vendor_event(struct nlmsghdr *nlh, int cmd)
+ {
+ 	struct net_device *dev;
+ 	u_int32_t ifidx;
+@@ -557,7 +558,7 @@ static int mc_event_handler(void *buf, i
+  * 	Parse the generic control family response message and return
+  * 	the multicast id of MLME and VENDOR multicast groups of nl80211 family.
+  */
+-int mc_get_event_id(struct nlmsghdr *nlh, const char *event_name, int *event_id)
++static int mc_get_event_id(struct nlmsghdr *nlh, const char *event_name, int *event_id)
+ {
+     struct nlattr *tb[CTRL_ATTR_MAX+1];
+     struct nlattr *mcgrp;
+@@ -608,7 +609,7 @@ int mc_get_event_id(struct nlmsghdr *nlh
+  *	Get the multicast id of MLME and VENDOR multicast groups of nl80211 family.
+  */
+ 
+-int mc_parse_genl_ctrl_response(struct nlmsghdr *nlh, int *mlme_id, int *vendor_id)
++static int mc_parse_genl_ctrl_response(struct nlmsghdr *nlh, int *mlme_id, int *vendor_id)
+ {
+ 	int res_mlme, res_vendor;
+ 
+@@ -642,7 +643,7 @@ int mc_parse_genl_ctrl_response(struct n
+  *	Construct a message to generic control family to resolve the
+  *	nl80211 multicast groups.
+  */
+-struct nlmsghdr *mc_construct_nl_message(void)
++static struct nlmsghdr *mc_construct_nl_message(void)
+ {
+ 	int flags = GFP_ATOMIC;
+ 	struct sk_buff *skb;
+@@ -705,7 +706,7 @@ err:
+  *  mc_resolve_nl80211_family()
+  *	Resolve the nl80211 family multicast groups to
+  *	receive Wi-Fi specific events.
+  */
+-int mc_resolve_nl80211_family(struct socket *sock, struct sockaddr_nl *addr)
++static int mc_resolve_nl80211_family(struct socket *sock, struct sockaddr_nl *addr)
+ {
+ 	struct nlmsghdr *nlh;
+ 	struct kvec iov = {0};
 --- a/mc_snooping.c
 +++ b/mc_snooping.c
 @@ -644,7 +644,7 @@
