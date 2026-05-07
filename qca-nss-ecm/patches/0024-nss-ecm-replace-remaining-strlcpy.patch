@@ -1,0 +1,20 @@
+--- a/ecm_db/ecm_db_iface.c
++++ b/ecm_db/ecm_db_iface.c
+@@ -3786,7 +3786,7 @@ void ecm_db_iface_add_ipsec_tunnel(struc
+ #endif
+ 	ii->arg = arg;
+ 	ii->final = final;
+-	strlcpy(ii->name, name, IFNAMSIZ);
++	strscpy(ii->name, name, IFNAMSIZ);
+ 	ii->mtu = mtu;
+ 	ii->interface_identifier = interface_identifier;
+ 	ii->ae_interface_identifier = ae_interface_identifier;
+@@ -3838,7 +3838,7 @@ void ecm_db_iface_add_rawip(struct ecm_d
+ #endif
+ 	ii->arg = arg;
+ 	ii->final = final;
+-	strlcpy(ii->name, name, IFNAMSIZ);
++	strscpy(ii->name, name, IFNAMSIZ);
+ 	ii->mtu = mtu;
+ 	ii->interface_identifier = interface_identifier;
+ 	ii->ae_interface_identifier = ae_interface_identifier;

@@ -190,7 +190,6 @@ Kernel modules for NSS connection manager
 Add support for DS-lite and ipip6 tunnel
 endef
 
-
 define KernelPackage/qca-nss-drv-bridge-mgr
   SECTION:=kernel
   CATEGORY:=Kernel modules
@@ -319,7 +318,6 @@ define KernelPackage/qca-nss-drv-netlink/config
 	source "$(SOURCE)/Config.in"
 endef
 
-
 define KernelPackage/qca-nss-drv-eogremgr
   SECTION:=kernel
   CATEGORY:=Kernel modules
@@ -334,7 +332,6 @@ endef
 define KernelPackage/qca-nss-drv-eogremgr/description
 Kernel module for managing NSS EoGRE
 endef
-
 
 define KernelPackage/qca-nss-drv-vxlanmgr
   SECTION:=kernel
@@ -384,7 +381,6 @@ define KernelPackage/qca-nss-drv-mirror/Description
 Kernel module for managing NSS Mirror
 endef
 
-
 define KernelPackage/qca-nss-drv-wifi-meshmgr
   SECTION:=kernel
   CATEGORY:=Kernel modules
@@ -411,7 +407,6 @@ define Build/InstallDev
 	$(call Build/InstallDev/qca-nss-clients,$(1))
 endef
 
-
 define KernelPackage/qca-nss-drv-netlink/install
 	$(INSTALL_DIR) $(1)/etc/init.d
 	$(INSTALL_BIN) ./files/qca-nss-netlink.init $(1)/etc/init.d/qca-nss-netlink
@@ -426,7 +421,6 @@ EXTRA_CFLAGS+= \
 	-I$(STAGING_DIR)/usr/include/nat46
 
 # Build individual packages if selected
-
 
 ifneq ($(CONFIG_PACKAGE_kmod-qca-nss-drv-tun6rd),)
 NSS_CLIENTS_MAKE_OPTS+=tun6rd=m
@@ -456,7 +450,6 @@ endif
 ifneq ($(CONFIG_PACKAGE_kmod-qca-nss-drv-igs),)
 NSS_CLIENTS_MAKE_OPTS+=igs=y
 endif
-
 
 ifneq ($(CONFIG_PACKAGE_kmod-qca-nss-drv-bridge-mgr),)
 NSS_CLIENTS_MAKE_OPTS+=bridge-mgr=y
@@ -519,11 +512,9 @@ endif
 
 endif
 
-
 ifneq ($(CONFIG_PACKAGE_kmod-qca-nss-drv-eogremgr),)
 NSS_CLIENTS_MAKE_OPTS+=eogremgr=y
 endif
-
 
 ifneq ($(CONFIG_PACKAGE_kmod-qca-nss-drv-vxlanmgr),)
 NSS_CLIENTS_MAKE_OPTS+=vxlanmgr=y
@@ -537,7 +528,6 @@ endif
 ifneq ($(CONFIG_PACKAGE_kmod-qca-nss-drv-mirror),)
 NSS_CLIENTS_MAKE_OPTS+=mirror=y
 endif
-
 
 ifneq ($(CONFIG_PACKAGE_kmod-qca-nss-drv-wifi-meshmgr),)
 NSS_CLIENTS_MAKE_OPTS+=wifi-meshmgr=y

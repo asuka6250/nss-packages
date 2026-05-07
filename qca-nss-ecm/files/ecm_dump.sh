@@ -38,8 +38,7 @@ ECM_STATE=/sys/kernel/debug/ecm/ecm_state/state_dev_major
 # tests to see if ECM is up and ready to receive commands.
 # returns 0 if ECM is fully up and ready, else 1
 ecm_is_ready() {
-	if [ ! -e "${ECM_STATE}" ]
-	then
+	if [ ! -e "${ECM_STATE}" ]; then
 		return 1
 	fi
 	return 0
@@ -47,22 +46,20 @@ ecm_is_ready() {
 
 #
 # module_state_mount(module_name)
-#      Mounts the state file of the module, if supported
+#			Mounts the state file of the module, if supported
 #
 module_state_mount() {
 	local module_name=$1
 	local mount_dir=$2
 	local state_file="/sys/kernel/debug/ecm/${module_name}/state_dev_major"
 
-	if [ -e "${mount_dir}/${module_name}" ]
-	then
+	if [ -e "${mount_dir}/${module_name}" ]; then
 		# already mounted
 		return 0
 	fi
 
 	#echo "Mount state file for $module_name ..."
-	if [ ! -e "$state_file" ]
-	then
+	if [ ! -e "$state_file" ]; then
 		#echo "... $module_name does not support state"
 		return 1
 	fi

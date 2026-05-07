@@ -21,7 +21,6 @@ define Package/qca-ssdk-shell
   DEPENDS:=+kmod-qca-ssdk
 endef
 
-
 define Package/qca-ssdk-shell/Description
   This package contains a qca-ssdk shell application for QCA chipset
 endef
@@ -46,6 +45,5 @@ define Package/qca-ssdk-shell/install
 	$(INSTALL_DIR) $(1)/usr/sbin
 	$(INSTALL_BIN) $(PKG_BUILD_DIR)/build/bin/ssdk_sh $(1)/usr/sbin/
 endef
-
 
 $(eval $(call BuildPackage,qca-ssdk-shell))

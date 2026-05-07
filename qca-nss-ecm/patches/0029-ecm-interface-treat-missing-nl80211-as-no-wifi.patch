@@ -1,0 +1,68 @@
+--- a/ecm_interface.c
++++ b/ecm_interface.c
+@@ -8864,6 +8864,25 @@
+ 	 */
+ 	nlh = (struct nlmsghdr *)buf;
+ 	while (NLMSG_OK(nlh, size)) {
++		if (nlh->nlmsg_type == NLMSG_ERROR) {
++			struct nlmsgerr *nlerr = nlmsg_data(nlh);
++
++			if (nlmsg_len(nlh) < sizeof(*nlerr)) {
++				DEBUG_WARN("%px: Invalid NL error message length\n", nlh);
++				kfree(buf);
++				return -EINVAL;
++			}
++
++			if (nlerr->error) {
++				ret = nlerr->error;
++				kfree(buf);
++				return ret;
++			}
++
++			nlh = NLMSG_NEXT(nlh, size);
++			continue;
++		}
++
+ 		DEBUG_INFO("%px: Received an NL response, length %d type %d\n", nlh, nlh->nlmsg_len, nlh->nlmsg_type);
+ 		mc_group_id = ecm_interface_parse_genl_ctrl_response(nlh);
+ 		if (mc_group_id < 0) {
+@@ -8884,16 +8902,19 @@
+ 	 * Add this socket as a memeber to the MLME multicast group of the
+ 	 * nl80211 family.
+ 	 */
+-	if (mc_group_id != ECM_INTERFACE_NL80211_MC_GROUP_INVALID_ID) {
+-		ret = sock->ops->setsockopt(sock, SOL_NETLINK, NETLINK_ADD_MEMBERSHIP, KERNEL_SOCKPTR((void *)&mc_group_id), sizeof(mc_group_id));
+-		if (ret < 0) {
+-			DEBUG_WARN("%px: Failed to set the multicast membership %d ret %d\n", sock, mc_group_id, ret);
+-			return ret;
+-		}
++	if (mc_group_id == ECM_INTERFACE_NL80211_MC_GROUP_INVALID_ID) {
++		DEBUG_WARN("%px: Failed to resolve the nl80211 MLME multicast group\n", sock);
++		return -ENOENT;
++	}
+ 
+-		DEBUG_INFO("%px: Adding a this sokcet as a member to NL80211 MLME multicast group %d \n", sock, mc_group_id);
++	ret = sock->ops->setsockopt(sock, SOL_NETLINK, NETLINK_ADD_MEMBERSHIP, KERNEL_SOCKPTR((void *)&mc_group_id), sizeof(mc_group_id));
++	if (ret < 0) {
++		DEBUG_WARN("%px: Failed to set the multicast membership %d ret %d\n", sock, mc_group_id, ret);
++		return ret;
+ 	}
+ 
++	DEBUG_INFO("%px: Adding a this sokcet as a member to NL80211 MLME multicast group %d \n", sock, mc_group_id);
++
+ 	return 0;
+ }
+ 
+@@ -8935,7 +8956,11 @@
+ 	 */
+ 	err = ecm_interface_resolve_nl80211_family(__ewn.sock, &saddr);
+ 	if (err < 0) {
+-		DEBUG_ERROR("Failed to resolve the nl80211 generic netlink family err %d\n", err);
++		if ((err == -ENOENT) || (err == -EINVAL)) {
++			DEBUG_INFO("nl80211 generic netlink family is unavailable, disabling ECM WiFi event listener err %d\n", err);
++		} else {
++			DEBUG_ERROR("Failed to resolve the nl80211 generic netlink family err %d\n", err);
++		}
+ 		goto exit2;
+ 	}
+ 

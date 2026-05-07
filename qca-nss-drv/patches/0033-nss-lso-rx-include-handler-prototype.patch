@@ -1,0 +1,10 @@
+--- a/nss_lso_rx.c
++++ b/nss_lso_rx.c
+@@ -20,6 +20,7 @@
+  */
+ 
+ #include <nss_core.h>
++#include "nss_tx_rx_common.h"
+ #include "nss_lso_rx_stats.h"
+ #include "nss_lso_rx_strings.h"
+ 

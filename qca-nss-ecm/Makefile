@@ -97,7 +97,6 @@ ifneq ($(CONFIG_PACKAGE_kmod-qca-nss-drv-igs),)
 ECM_MAKE_OPTS+=ECM_CLASSIFIER_DSCP_IGS=y
 endif
 
-
 ifeq ($(CONFIG_PACKAGE_kmod-vxlan),y)
 ECM_MAKE_OPTS+=ECM_INTERFACE_VXLAN_ENABLE=y
 endif
@@ -120,9 +119,9 @@ ifneq ($(CONFIG_PACKAGE_kmod-nat46),)
 ECM_MAKE_OPTS+=ECM_INTERFACE_MAP_T_ENABLE=y
 endif
 
-ifneq ($(CONFIG_PACKAGE_kmod-ipsec),)
-ECM_MAKE_OPTS+=ECM_INTERFACE_IPSEC_ENABLE=y
-endif
+# NSS IPsec support is disabled in qca-nss-drv for qualcommax/6.18, so do not
+# enable ECM's NSS IPsec glue based on the generic kernel IPsec package.
+ECM_MAKE_OPTS+=ECM_INTERFACE_IPSEC_ENABLE=n
 
 ifneq ($(CONFIG_PACKAGE_kmod-pppoe),)
 ECM_MAKE_OPTS+=ECM_INTERFACE_PPPOE_ENABLE=y \
@@ -152,7 +151,6 @@ endif
 ifneq ($(CONFIG_PACKAGE_kmod-ip6-tunnel),)
 ECM_MAKE_OPTS+=ECM_INTERFACE_TUNIPIP6_ENABLE=y
 endif
-
 
 ifneq ($(CONFIG_PACKAGE_kmod-bonding),)
 ECM_MAKE_OPTS+=ECM_INTERFACE_BOND_ENABLE=y
