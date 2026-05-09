@@ -880,3 +880,346 @@
  };
  MODULE_DEVICE_TABLE(of, nss_dt_ids);
  #endif
+
+--- a/exports/nss_ipv4_reasm.h
++++ b/exports/nss_ipv4_reasm.h
+@@ -53,7 +53,25 @@ struct nss_ipv4_reasm_stats_notification
+ 
+ #ifdef __KERNEL__ /* only kernel will use. */
+ 
++/**
++ * nss_ipv4_reasm_get_context
++ *	Gets the NSS context instance for IPv4 reassembly.
++ *
++ * @return
++ * NSS context instance for IPv4 reassembly.
++ */
++extern struct nss_ctx_instance *nss_ipv4_reasm_get_context(void);
++
++/**
++ * nss_ipv4_reasm_register_handler
++ *	Registers the IPv4 reassembly message handler.
++ *
++ * @return
++ * None.
++ */
++extern void nss_ipv4_reasm_register_handler(void);
++
+ /**
+  * nss_ipv4_reasm_stats_register_notifier
+  *	Registers a statistics notifier.
+
+--- a/exports/nss_ipv6_reasm.h
++++ b/exports/nss_ipv6_reasm.h
+@@ -57,5 +57,20 @@ struct nss_ipv6_reasm_stats_notification
+ #ifdef __KERNEL__
+ 
+ /**
++ * nss_ipv6_reasm_get_context
++ *	Gets the NSS context instance for IPv6 reassembly.
++ *
++ * @return
++ * NSS context instance for IPv6 reassembly.
++ */
++extern struct nss_ctx_instance *nss_ipv6_reasm_get_context(void);
++
++/**
++ * nss_ipv6_reasm_register_handler
++ *	Registers the IPv6 reassembly message handler.
++ */
++extern void nss_ipv6_reasm_register_handler(void);
++
++/**
+  * nss_ipv6_reasm_stats_register_notifier
+  *	Registers a statistics notifier.
+
+--- a/nss_ipv4_reasm_strings.c
++++ b/nss_ipv4_reasm_strings.c
+@@ -20,6 +20,7 @@
+ #include "nss_core.h"
+ #include <nss_ipv4_reasm.h>
+ #include "nss_strings.h"
++#include "nss_ipv4_reasm_strings.h"
+ 
+ /*
+  * nss_ipv4_reasm_strings_stats
+
+--- a/nss_ipv6_reasm_strings.c
++++ b/nss_ipv6_reasm_strings.c
+@@ -20,6 +20,7 @@
+ #include "nss_core.h"
+ #include <nss_ipv6_reasm.h>
+ #include "nss_strings.h"
++#include "nss_ipv6_reasm_strings.h"
+ 
+ /*
+  * nss_ipv6_reasm_strings_stats
+
+--- a/nss_lso_rx.c
++++ b/nss_lso_rx.c
+@@ -20,6 +20,7 @@
+  */
+ 
+ #include <nss_core.h>
++#include "nss_tx_rx_common.h"
+ #include "nss_lso_rx_stats.h"
+ #include "nss_lso_rx_strings.h"
+
+--- a/exports/nss_gre_tunnel.h
++++ b/exports/nss_gre_tunnel.h
+@@ -341,6 +341,17 @@ extern void nss_gre_tunnel_msg_init(stru
+  */
+ extern struct nss_ctx_instance *nss_gre_tunnel_get_ctx(void);
+ 
++/**
++ * nss_gre_tunnel_ifnum_with_core_id()
++ *	Appends core ID to a GRE tunnel interface number.
++ *
++ * @param[in] if_num  NSS interface number.
++ *
++ * @return
++ * Interface number with core ID appended.
++ */
++extern int nss_gre_tunnel_ifnum_with_core_id(int if_num);
++
+ /**
+  * nss_gre_tunnel_register_if
+  *	Registers GRE Tunnel interface with NSS.
+--- a/nss_gre_tunnel_log.c
++++ b/nss_gre_tunnel_log.c
+@@ -20,6 +20,7 @@
+  */
+ 
+ #include "nss_core.h"
++#include "nss_gre_tunnel_log.h"
+ 
+ /*
+  * nss_gre_tunnel_log_message_types_str
+--- a/exports/nss_sjack.h
++++ b/exports/nss_sjack.h
+@@ -131,6 +131,14 @@ extern struct nss_ctx_instance *nss_sjac
+  */
+ extern void nss_sjack_unregister_if(uint32_t if_num);
+ 
++/**
++ * nss_sjack_get_context()
++ *	Gets the NSS context instance for SJACK.
++ *
++ * @return NSS context instance for SJACK.
++ */
++extern struct nss_ctx_instance *nss_sjack_get_context(void);
++
+ /**
+  * nss_sjack_tx_msg
+  *	Sends SJACK messages.
+--- a/nss_sjack_log.c
++++ b/nss_sjack_log.c
+@@ -20,6 +20,7 @@
+  */
+ 
+ #include "nss_core.h"
++#include "nss_sjack_log.h"
+ 
+ /*
+  * nss_sjack_log_message_types_str
+--- a/nss_c2c_tx_log.c
++++ b/nss_c2c_tx_log.c
+@@ -19,6 +19,7 @@
+  */
+ 
+ #include "nss_core.h"
++#include "nss_c2c_tx_log.h"
+ 
+ /*
+  * nss_c2c_tx_log_message_types_str
+--- a/nss_capwap_log.c
++++ b/nss_capwap_log.c
+@@ -22,6 +22,7 @@
+  */
+ 
+ #include "nss_core.h"
++#include "nss_capwap_log.h"
+ 
+ /*
+  * nss_capwap_log_message_types_str
+--- a/nss_clmap_log.c
++++ b/nss_clmap_log.c
+@@ -19,6 +19,7 @@
+  */
+ 
+ #include "nss_core.h"
++#include "nss_clmap_log.h"
+ 
+ /*
+  * nss_clmap_log_message_types_str
+--- a/nss_crypto_log.c
++++ b/nss_crypto_log.c
+@@ -19,6 +19,7 @@
+  */
+ 
+ #include "nss_core.h"
++#include "nss_crypto_log.h"
+ 
+ /*
+  * nss_crypto_log_message_types_str
+--- a/nss_dtls_cmn_log.c
++++ b/nss_dtls_cmn_log.c
+@@ -22,6 +22,7 @@
+  */
+ 
+ #include "nss_core.h"
++#include "nss_dtls_cmn_log.h"
+ 
+ /*
+  * nss_dtls_cmn_log_message_types_str
+--- a/nss_dtls_log.c
++++ b/nss_dtls_log.c
+@@ -19,6 +19,7 @@
+  */
+ 
+ #include "nss_core.h"
++#include "nss_dtls_log.h"
+ 
+ /*
+  * nss_dtls_log_message_types_str
+--- a/nss_ipsec_cmn_log.c
++++ b/nss_ipsec_cmn_log.c
+@@ -19,6 +19,7 @@
+  */
+ 
+ #include "nss_core.h"
++#include "nss_ipsec_cmn_log.h"
+ 
+ /*
+  * nss_ipsec_cmn_log_message_types_str
+--- a/nss_ipsec_log.c
++++ b/nss_ipsec_log.c
+@@ -19,6 +19,7 @@
+  */
+ 
+ #include "nss_core.h"
++#include "nss_ipsec_log.h"
+ 
+ /*
+  * nss_ipsec_log_message_types_str
+--- a/nss_oam_log.c
++++ b/nss_oam_log.c
+@@ -19,6 +19,7 @@
+  */
+ 
+ #include "nss_core.h"
++#include "nss_oam_log.h"
+ 
+ /*
+  * nss_oam_log_message_types_str
+--- a/nss_portid_log.c
++++ b/nss_portid_log.c
+@@ -19,6 +19,7 @@
+  */
+ 
+ #include "nss_core.h"
++#include "nss_portid_log.h"
+ 
+ /*
+  * nss_portid_log_message_types_str
+--- a/nss_pvxlan_log.c
++++ b/nss_pvxlan_log.c
+@@ -22,6 +22,7 @@
+  */
+ 
+ #include "nss_core.h"
++#include "nss_pvxlan_log.h"
+ 
+ /*
+  * nss_pvxlan_log_message_types_str
+--- a/nss_qrfs_log.c
++++ b/nss_qrfs_log.c
+@@ -20,6 +20,7 @@
+  */
+ 
+ #include "nss_core.h"
++#include "nss_qrfs_log.h"
+ #define NSS_QRFS_LOG_IPV4 4
+ #define NSS_QRFS_LOG_IPV6 6
+ 
+--- a/nss_qvpn_log.c
++++ b/nss_qvpn_log.c
+@@ -19,6 +19,7 @@
+  */
+ 
+ #include "nss_core.h"
++#include "nss_qvpn_log.h"
+ 
+ /*
+  * nss_qvpn_log_message_types_str
+--- a/nss_tls_log.c
++++ b/nss_tls_log.c
+@@ -21,6 +21,7 @@
+  */
+ 
+ #include "nss_core.h"
++#include "nss_tls_log.h"
+ 
+ /*
+  * nss_tls_log_message_types_str
+--- a/nss_trustsec_rx_log.c
++++ b/nss_trustsec_rx_log.c
+@@ -19,6 +19,7 @@
+  */
+ 
+ #include "nss_core.h"
++#include "nss_trustsec_rx_log.h"
+ 
+ /*
+  * nss_trustsec_rx_log_message_types_str
+--- a/nss_trustsec_tx_log.c
++++ b/nss_trustsec_tx_log.c
+@@ -19,6 +19,7 @@
+  */
+ 
+ #include "nss_core.h"
++#include "nss_trustsec_tx_log.h"
+ 
+ /*
+  * nss_trustsec_tx_log_message_types_str
+--- a/nss_udp_st_log.c
++++ b/nss_udp_st_log.c
+@@ -22,6 +22,7 @@
+  */
+ 
+ #include "nss_core.h"
++#include "nss_udp_st_log.h"
+ 
+ /*
+  * nss_udp_st_log_message_types_str
+--- a/nss_wifi_log.c
++++ b/nss_wifi_log.c
+@@ -19,6 +19,7 @@
+  */
+ 
+ #include "nss_core.h"
++#include "nss_wifi_log.h"
+ 
+ /*
+  * nss_wifi_log_message_types_str
+--- a/nss_rmnet_rx.c
++++ b/nss_rmnet_rx.c
+@@ -44,7 +44,7 @@ extern int nss_ctl_redirect;
+  * nss_rmnet_rx_verify_if_num()
+  *	Verify if_num passed to us.
+  */
+-bool nss_rmnet_rx_verify_if_num(uint32_t if_num)
++static bool nss_rmnet_rx_verify_if_num(uint32_t if_num)
+ {
+ 	enum nss_dynamic_interface_type type = nss_dynamic_interface_get_type(nss_rmnet_rx_get_context(), if_num);
+ 
+--- a/nss_udp_st_strings.c
++++ b/nss_udp_st_strings.c
+@@ -20,6 +20,7 @@
+ #include "nss_stats.h"
+ #include "nss_core.h"
+ #include <nss_udp_st.h>
++#include "nss_udp_st_strings.h"
+ #include "nss_strings.h"
+ 
+ /*

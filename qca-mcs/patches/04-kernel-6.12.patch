@@ -1,6 +1,6 @@
 --- a/mc_forward.c
 +++ b/mc_forward.c
-@@ -29,6 +29,9 @@
+@@ -31,6 +31,9 @@
  #include "mc_snooping.h"
  #include "mc_osdep.h"
  
@@ -79,7 +79,7 @@
  				 int(*okfn)(struct sk_buff *));
 --- a/mc_snooping.c
 +++ b/mc_snooping.c
-@@ -28,7 +29,11 @@
+@@ -33,7 +33,11 @@
  #include <linux/etherdevice.h>
  #include <linux/rculist.h>
  #include <linux/timer.h>
@@ -91,7 +91,7 @@
  #include <asm/atomic.h>
  #include <linux/random.h>
  #include <net/ip.h>
-@@ -3240,7 +3245,6 @@ static void mc_acl_table_init(struct mc_
+@@ -3252,7 +3256,6 @@ static void mc_acl_table_init(struct mc_
  	mc->mld_acl.pattern_count = 4;
  #endif
  
