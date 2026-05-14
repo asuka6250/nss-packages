@@ -1,6 +1,6 @@
 --- a/Makefile
 +++ b/Makefile
-@@ -3,6 +3,8 @@
+@@ -4,6 +4,8 @@
  
  obj-m += qca-nss-drv.o
  

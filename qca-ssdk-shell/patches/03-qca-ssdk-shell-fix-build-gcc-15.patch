@@ -132,7 +132,7 @@
              if (ret)
                  dprintf("%s", usage);
          }
-@@ -14655,7 +14655,7 @@ cmd_data_check_egress_shaper(char *cmd_s
+@@ -14599,7 +14599,7 @@ cmd_data_check_egress_shaper(char *cmd_s
  {
      char *cmd;
      sw_error_t rv;
@@ -141,7 +141,7 @@
      fal_egress_shaper_t entry;
  
      aos_mem_zero(&entry, sizeof (fal_egress_shaper_t));
-@@ -14677,7 +14677,7 @@ cmd_data_check_egress_shaper(char *cmd_s
+@@ -14621,7 +14621,7 @@ cmd_data_check_egress_shaper(char *cmd_s
          }
          else
          {
@@ -150,7 +150,7 @@
                                          sizeof (a_bool_t));
              if (SW_OK != rv)
                  dprintf("usage: <yes/no/y/n>\n");
-@@ -14685,7 +14685,7 @@ cmd_data_check_egress_shaper(char *cmd_s
+@@ -14629,7 +14629,7 @@ cmd_data_check_egress_shaper(char *cmd_s
      }
      while (talk_mode && (SW_OK != rv));
  
@@ -159,7 +159,7 @@
      {
          entry.meter_unit = FAL_BYTE_BASED;
      }
-@@ -14865,7 +14865,7 @@ cmd_data_check_acl_policer(char *cmd_str
+@@ -14809,7 +14809,7 @@ cmd_data_check_acl_policer(char *cmd_str
  {
      char *cmd;
      sw_error_t rv;
@@ -168,7 +168,7 @@
      fal_acl_policer_t entry;
  
      aos_mem_zero(&entry, sizeof (fal_acl_policer_t));
-@@ -14912,7 +14912,7 @@ cmd_data_check_acl_policer(char *cmd_str
+@@ -14856,7 +14856,7 @@ cmd_data_check_acl_policer(char *cmd_str
          }
          else
          {
@@ -177,7 +177,7 @@
                                          sizeof (a_bool_t));
              if (SW_OK != rv)
                  dprintf("usage: <yes/no/y/n>\n");
-@@ -14920,7 +14920,7 @@ cmd_data_check_acl_policer(char *cmd_str
+@@ -14864,7 +14864,7 @@ cmd_data_check_acl_policer(char *cmd_str
      }
      while (talk_mode && (SW_OK != rv));
  
@@ -186,7 +186,7 @@
      {
          entry.meter_unit = FAL_BYTE_BASED;
      }
-@@ -15205,7 +15205,7 @@ cmd_data_check_port_policer(char *cmd_st
+@@ -15149,7 +15149,7 @@ cmd_data_check_port_policer(char *cmd_st
  {
      char *cmd;
      sw_error_t rv;
@@ -195,7 +195,7 @@
      fal_port_policer_t entry;
  
      aos_mem_zero(&entry, sizeof (fal_port_policer_t));
-@@ -15252,7 +15252,7 @@ cmd_data_check_port_policer(char *cmd_st
+@@ -15196,7 +15196,7 @@ cmd_data_check_port_policer(char *cmd_st
          }
          else
          {
@@ -204,7 +204,7 @@
                                          sizeof (a_bool_t));
              if (SW_OK != rv)
                  dprintf("usage: <yes/no/y/n>\n");
-@@ -15260,7 +15260,7 @@ cmd_data_check_port_policer(char *cmd_st
+@@ -15204,7 +15204,7 @@ cmd_data_check_port_policer(char *cmd_st
      }
      while (talk_mode && (SW_OK != rv));
  

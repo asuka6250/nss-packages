@@ -23,8 +23,77 @@
 +#endif
 +
  /*
-  * nss_top_instance
-  *	NSS top level instance structure.
+  * NSS stats read context
+  */
+--- a/nss_hal/fsm9010/nss_hal_pvt.c
++++ b/nss_hal/fsm9010/nss_hal_pvt.c
+@@ -291,7 +291,7 @@ static int __nss_hal_request_irq(struct
+ 	}
+ 
+ 	int_ctx->irq = npd->irq[irq_num];
+-	netif_napi_add_weight(&nss_ctx->napi_ndev, &int_ctx->napi, nss_core_handle_napi, 64);
++	netif_napi_add_weight(NSS_CTX_NAPI_NDEV(nss_ctx), &int_ctx->napi, nss_core_handle_napi, 64);
+ 	return 0;
+ }
+ 
+--- a/nss_hal/ipq50xx/nss_hal_pvt.c
++++ b/nss_hal/ipq50xx/nss_hal_pvt.c
+@@ -599,7 +599,7 @@ static int __nss_hal_request_irq(struct
+ 		return err;
+ 	}
+ 
+-	netif_napi_add_weight(&nss_ctx->napi_ndev, &int_ctx->napi, napi_poll_cb, napi_wgt);
++	netif_napi_add_weight(NSS_CTX_NAPI_NDEV(nss_ctx), &int_ctx->napi, napi_poll_cb, napi_wgt);
+ 	int_ctx->cause = cause;
+ 	err = request_irq(irq, nss_hal_handle_irq, 0, irq_name, int_ctx);
+ 	if (err) {
+--- a/nss_hal/ipq60xx/nss_hal_pvt.c
++++ b/nss_hal/ipq60xx/nss_hal_pvt.c
+@@ -707,7 +707,7 @@ static int __nss_hal_request_irq(struct
+ 		return err;
+ 	}
+ 
+-	netif_napi_add_weight(&nss_ctx->napi_ndev, &int_ctx->napi, napi_poll_cb, napi_wgt);
++	netif_napi_add_weight(NSS_CTX_NAPI_NDEV(nss_ctx), &int_ctx->napi, napi_poll_cb, napi_wgt);
+ 	int_ctx->cause = cause;
+ 	err = request_irq(irq, nss_hal_handle_irq, 0, irq_name, int_ctx);
+ 	if (err) {
+--- a/nss_hal/ipq806x/nss_hal_pvt.c
++++ b/nss_hal/ipq806x/nss_hal_pvt.c
+@@ -1185,7 +1185,7 @@ static int __nss_hal_request_irq(struct
+ 	}
+ 
+ 	int_ctx->irq = npd->irq[irq_num];
+-	netif_napi_add_weight(&nss_ctx->napi_ndev, &int_ctx->napi, nss_core_handle_napi, 64);
++	netif_napi_add_weight(NSS_CTX_NAPI_NDEV(nss_ctx), &int_ctx->napi, nss_core_handle_napi, 64);
+ 
+ 	return 0;
+ }
+--- a/nss_hal/ipq807x/nss_hal_pvt.c
++++ b/nss_hal/ipq807x/nss_hal_pvt.c
+@@ -751,7 +751,7 @@ static int __nss_hal_request_irq(struct
+ 		return err;
+ 	}
+ 
+-	netif_napi_add_weight(&nss_ctx->napi_ndev, &int_ctx->napi, napi_poll_cb, napi_wgt);
++	netif_napi_add_weight(NSS_CTX_NAPI_NDEV(nss_ctx), &int_ctx->napi, napi_poll_cb, napi_wgt);
+ 	int_ctx->cause = cause;
+ 	err = request_irq(irq, nss_hal_handle_irq, 0, irq_name, int_ctx);
+ 	if (err) {
+--- a/nss_hal/ipq95xx/nss_hal_pvt.c
++++ b/nss_hal/ipq95xx/nss_hal_pvt.c
+@@ -890,9 +890,9 @@ static int __nss_hal_request_irq(struct
+ 	}
+ 
+ #if (LINUX_VERSION_CODE < KERNEL_VERSION(6, 6, 0))
+-	netif_napi_add(&nss_ctx->napi_ndev, &int_ctx->napi, napi_poll_cb, napi_wgt);
++	netif_napi_add(NSS_CTX_NAPI_NDEV(nss_ctx), &int_ctx->napi, napi_poll_cb, napi_wgt);
+ #else
+-	netif_napi_add_weight(&nss_ctx->napi_ndev, &int_ctx->napi, napi_poll_cb, napi_wgt);
++	netif_napi_add_weight(NSS_CTX_NAPI_NDEV(nss_ctx), &int_ctx->napi, napi_poll_cb, napi_wgt);
+ #endif
+ 	int_ctx->cause = cause;
+ 	err = request_irq(irq, nss_hal_handle_irq, 0, irq_name, int_ctx);
 --- a/nss_hal/nss_hal.c
 +++ b/nss_hal/nss_hal.c
 @@ -360,10 +360,16 @@ int nss_hal_probe(struct platform_device
@@ -57,7 +126,7 @@
  err_init:
  	if (nss_dev->dev.of_node) {
  		if (npd->nmap) {
-@@ -900,6 +912,11 @@ int nss_hal_remove(struct platform_devic
+@@ -900,6 +911,11 @@ int nss_hal_remove(struct platform_devic
  		nss_hal_clean_up_irq(&nss_ctx->int_ctx[i]);
  	}
  
@@ -69,50 +138,3 @@
  	/*
  	 * nss-drv is exiting, unregister and restore host data plane
  	 */
---- a/nss_hal/fsm9010/nss_hal_pvt.c
-+++ b/nss_hal/fsm9010/nss_hal_pvt.c
-@@ -294,4 +294,4 @@ int nss_hal_register_irq(struct nss_ctx_
- 	int_ctx->irq = npd->irq[irq_num];
--	netif_napi_add_weight(&nss_ctx->napi_ndev, &int_ctx->napi, nss_core_handle_napi, 64);
-+	netif_napi_add_weight(NSS_CTX_NAPI_NDEV(nss_ctx), &int_ctx->napi, nss_core_handle_napi, 64);
- 	return 0;
- }
---- a/nss_hal/ipq50xx/nss_hal_pvt.c
-+++ b/nss_hal/ipq50xx/nss_hal_pvt.c
-@@ -602,3 +602,3 @@ int nss_hal_register_irq(struct nss_ctx_
--	netif_napi_add_weight(&nss_ctx->napi_ndev, &int_ctx->napi, napi_poll_cb, napi_wgt);
-+	netif_napi_add_weight(NSS_CTX_NAPI_NDEV(nss_ctx), &int_ctx->napi, napi_poll_cb, napi_wgt);
- 	int_ctx->cause = cause;
- 	err = request_irq(irq, nss_hal_handle_irq, 0, irq_name, int_ctx);
---- a/nss_hal/ipq60xx/nss_hal_pvt.c
-+++ b/nss_hal/ipq60xx/nss_hal_pvt.c
-@@ -710,3 +710,3 @@ int nss_hal_register_irq(struct nss_ctx_
--	netif_napi_add_weight(&nss_ctx->napi_ndev, &int_ctx->napi, napi_poll_cb, napi_wgt);
-+	netif_napi_add_weight(NSS_CTX_NAPI_NDEV(nss_ctx), &int_ctx->napi, napi_poll_cb, napi_wgt);
- 	int_ctx->cause = cause;
- 	err = request_irq(irq, nss_hal_handle_irq, 0, irq_name, int_ctx);
---- a/nss_hal/ipq806x/nss_hal_pvt.c
-+++ b/nss_hal/ipq806x/nss_hal_pvt.c
-@@ -1188,3 +1188,3 @@ int nss_hal_register_irq(struct nss_ctx_
--	netif_napi_add_weight(&nss_ctx->napi_ndev, &int_ctx->napi, nss_core_handle_napi, 64);
-+	netif_napi_add_weight(NSS_CTX_NAPI_NDEV(nss_ctx), &int_ctx->napi, nss_core_handle_napi, 64);
- 	if (nss_ctx->id == NSS_CORE_0) {
- 		switch (irq) {
---- a/nss_hal/ipq807x/nss_hal_pvt.c
-+++ b/nss_hal/ipq807x/nss_hal_pvt.c
-@@ -754,3 +754,3 @@ int nss_hal_register_irq(struct nss_ctx_
--	netif_napi_add_weight(&nss_ctx->napi_ndev, &int_ctx->napi, napi_poll_cb, napi_wgt);
-+	netif_napi_add_weight(NSS_CTX_NAPI_NDEV(nss_ctx), &int_ctx->napi, napi_poll_cb, napi_wgt);
- 	int_ctx->cause = cause;
- 	err = request_irq(irq, nss_hal_handle_irq, 0, irq_name, int_ctx);
---- a/nss_hal/ipq95xx/nss_hal_pvt.c
-+++ b/nss_hal/ipq95xx/nss_hal_pvt.c
-@@ -893,6 +893,6 @@ int nss_hal_register_irq(struct nss_ctx_
- #if (LINUX_VERSION_CODE < KERNEL_VERSION(6, 6, 0))
--	netif_napi_add(&nss_ctx->napi_ndev, &int_ctx->napi, napi_poll_cb, napi_wgt);
-+	netif_napi_add(NSS_CTX_NAPI_NDEV(nss_ctx), &int_ctx->napi, napi_poll_cb, napi_wgt);
- #else
--	netif_napi_add_weight(&nss_ctx->napi_ndev, &int_ctx->napi, napi_poll_cb, napi_wgt);
-+	netif_napi_add_weight(NSS_CTX_NAPI_NDEV(nss_ctx), &int_ctx->napi, napi_poll_cb, napi_wgt);
- #endif
- 	int_ctx->cause = cause;

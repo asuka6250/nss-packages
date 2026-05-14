@@ -12,6 +12,17 @@
  
  	switch (nmm->cm.type) {
  	case NSS_MATCH_STATS_SYNC:
+--- a/netlink/nss_nlipsec.c
++++ b/netlink/nss_nlipsec.c
+@@ -228,7 +228,7 @@ static void nss_nlipsec_process_event(vo
+ 	/*
+ 	 * Initialize the NETLINK common header
+ 	 */
+-	nss_nlipsec_rule_init(nl_rule, ev->type);
++	nss_nlipsec_rule_init(nl_rule, (enum nss_nlipsec_cmd)ev->type);
+ 
+ 	/*
+ 	 * Copy the contents of the sync message into the NETLINK message
 --- a/nss_qdisc/nss_ppe.c
 +++ b/nss_qdisc/nss_ppe.c
 @@ -348,8 +348,8 @@ static void nss_ppe_queue_disable(struct
@@ -384,7 +395,7 @@
  		dev_put(dev);
 --- a/tls/nss_tlsmgr_crypto.c
 +++ b/tls/nss_tlsmgr_crypto.c
-@@ -250,7 +250,7 @@ nss_tlsmgr_status_t nss_tlsmgr_crypto_up
+@@ -244,7 +244,7 @@ nss_tlsmgr_status_t nss_tlsmgr_crypto_up
  	status = nss_tls_tx_msg_sync(ctx->nss_ctx, ctx->ifnum, msg_type, sizeof(*ntcu), &ntm);
  	if (status != NSS_TX_SUCCESS) {
  		nss_tlsmgr_warn("%px: Failed to configure decap, status:%d, error:%d", ctx, status, ntm.cm.error);
@@ -393,7 +404,7 @@
  	}
  
  	/*
-@@ -361,7 +361,7 @@ nss_tlsmgr_status_t nss_tlsmgr_crypto_up
+@@ -355,7 +355,7 @@ nss_tlsmgr_status_t nss_tlsmgr_crypto_up
  	if (status != NSS_TX_SUCCESS) {
  		nss_tlsmgr_crypto_free(crypto);
  		nss_tlsmgr_warn("%px: Failed to configure decap, status:%d, error:%d", ctx, status, ntm.cm.error);
@@ -460,14 +471,3 @@
  	case NSS_WIFI_MESH_US_MESH_PATH_NOT_FOUND:
  		ifnum = decap_ifnum;
  		break;
---- a/netlink/nss_nlipsec.c
-+++ b/netlink/nss_nlipsec.c
-@@ -228,7 +228,7 @@ static void nss_nlipsec_process_event(vo
- 	/*
- 	 * Initialize the NETLINK common header
- 	 */
--	nss_nlipsec_rule_init(nl_rule, ev->type);
-+	nss_nlipsec_rule_init(nl_rule, (enum nss_nlipsec_cmd)ev->type);
- 
- 	/*
- 	 * Copy the contents of the sync message into the NETLINK message

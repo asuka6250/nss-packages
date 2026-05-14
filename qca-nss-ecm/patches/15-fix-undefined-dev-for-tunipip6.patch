@@ -8,4 +8,4 @@
 +#if defined(ECM_INTERFACE_GRE_TAP_ENABLE) || defined(ECM_INTERFACE_GRE_TUN_ENABLE) || defined(ECM_INTERFACE_TUNIPIP6_ENABLE)
  	struct net_device *dev;
  #endif
- 
+ 	int proto = ecm_db_connection_protocol_get(feci->ci);

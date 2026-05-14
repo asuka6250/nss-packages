@@ -1,16 +1,14 @@
 --- a/netfn/Makefile
 +++ b/netfn/Makefile
-@@ -10,8 +10,8 @@ OBJECTS = $(SOURCES:$(SRCDIR)/%.c=$(OBJ
+@@ -10,7 +10,7 @@ OBJECTS = $(SOURCES:$(SRCDIR)/%.c=$(OBJP
  
  INCLUDE += -I./include
  EXTRA_CFLAGS = -Wall -Werror -fpie -Wl,-z,relro -Wl,-z,now
 -EXTRA_LDFLAGS = -lnl-3 -lnl-genl-3 -pie -Wl,-z,relro -Wl,-z,now
--LDLIBS += -ljansson
 +EXTRA_LDFLAGS = -lnl-tiny -pie -Wl,-z,relro -Wl,-z,now
-+LDLIBS += -ljansson
+ LDLIBS += -ljansson
  
  all: release
- 
 --- a/netfn/netfn_rule.c
 +++ b/netfn/netfn_rule.c
 @@ -96,7 +96,7 @@ int netfn_rule_config(struct netfn_rule_
@@ -22,6 +20,22 @@
  	if (err < 0) {
  		netfn_log_error("%pFailed to send nl message, family(%s) with error(%d)\n", nrs, family, err);
  		goto fail;
+--- a/ppe/ppecfg/Makefile
++++ b/ppe/ppecfg/Makefile
+@@ -8,10 +8,10 @@ SOURCES = $(wildcard $(SRCDIR)/*.c)
+ HEADERS = $(wildcard $(SRCDIR)/*.h)
+ OBJECTS = $(SOURCES:$(SRCDIR)/%.c=$(OBJPATH)/%.o)
+ 
+-INCLUDE += -I./include
++INCLUDE += -I./include -I../ppenl_lib/include
+ EXTRA_CFLAGS = -Wall -Werror -fpie -Wl,-z,relro -Wl,-z,now
+-EXTRA_LDFLAGS = -lnl-genl-3 -lnl-ppe -pie -Wl,-z,relro -Wl,-z,now
+-LDLIBS  = -L../ppecfg_lib/obj
++EXTRA_LDFLAGS = -lnl-ppe -lnl-tiny -pie -Wl,-z,relro -Wl,-z,now
++LDLIBS  = -L../ppenl_lib/obj
+ LDLIBS  += -ljson-c
+ 
+ all: release
 --- a/ppe/ppenl_lib/nss_ppenl_sock.c
 +++ b/ppe/ppenl_lib/nss_ppenl_sock.c
 @@ -282,7 +282,7 @@ int nss_ppenl_sock_send(struct nss_ppenl
@@ -33,21 +47,3 @@
  	if (error < 0) {
  		nss_ppenl_sock_log_error("%d:failed to send (family:%s, error:%d)\n", pid, sock->family_name, error);
  		nss_ppenl_sock_deref(sock);
---- a/ppe/ppecfg/Makefile
-+++ b/ppe/ppecfg/Makefile
-@@ -8,11 +8,11 @@ SOURCES = $(wildcard $(SRCDIR)/*.c)
- HEADERS = $(wildcard $(SRCDIR)/*.h)
- OBJECTS = $(SOURCES:$(SRCDIR)/%.c=$(OBJPATH)/%.o)
- 
--INCLUDE += -I./include
-+INCLUDE += -I./include -I../ppenl_lib/include
- EXTRA_CFLAGS = -Wall -Werror -fpie -Wl,-z,relro -Wl,-z,now
--EXTRA_LDFLAGS = -lnl-genl-3 -lnl-ppe -pie -Wl,-z,relro -Wl,-z,now
--LDLIBS  = -L../ppecfg_lib/obj
--LDLIBS  += -ljson-c
-+EXTRA_LDFLAGS = -lnl-ppe -lnl-tiny -pie -Wl,-z,relro -Wl,-z,now
-+LDLIBS  = -L../ppenl_lib/obj
-+LDLIBS  += -ljson-c
- 
- all: release
- 

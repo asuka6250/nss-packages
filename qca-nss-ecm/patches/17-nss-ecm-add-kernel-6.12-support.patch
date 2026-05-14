@@ -1,6 +1,30 @@
 --- a/ecm_interface.c
 +++ b/ecm_interface.c
-@@ -8274,8 +8282,13 @@ int ecm_interface_wifi_event_stop(void)
+@@ -1395,7 +1395,11 @@ __be32 ecm_interface_vxlan_gpe_get_vni_r
+ 		__be32 daddr;
+ 
+ 		daddr = netif_is_vxlan(indev) ? ip_hdr(skb)->saddr : ip_hdr(skb)->daddr;
++#if LINUX_VERSION_CODE < KERNEL_VERSION(6, 18, 0)
+ 		rt = ip_route_output(&init_net, daddr, 0, 0, 0);
++#else
++		rt = ip_route_output(&init_net, daddr, 0, 0, 0, RT_SCOPE_UNIVERSE);
++#endif
+ 		if (IS_ERR_OR_NULL(rt)) {
+ 			DEBUG_WARN("%px: VXLAN-GPE failed to get IPv4 route to: %pI4\n", dev, &daddr);
+ 			goto rt_error;
+@@ -1718,7 +1722,11 @@ struct neighbour *ecm_interface_ipv4_nei
+ 	__be32 ipv4_addr;
+ 
+ 	ECM_IP_ADDR_TO_NIN4_ADDR(ipv4_addr, addr);
++#if LINUX_VERSION_CODE < KERNEL_VERSION(6, 18, 0)
+ 	rt = ip_route_output(&init_net, ipv4_addr, 0, 0, 0);
++#else
++	rt = ip_route_output(&init_net, ipv4_addr, 0, 0, 0, RT_SCOPE_UNIVERSE);
++#endif
+ 	if (IS_ERR_OR_NULL(rt)) {
+ 		return NULL;
+ 	}
+@@ -9213,8 +9221,13 @@ int ecm_interface_wifi_event_stop(void)
   * ecm_interface_igs_enabled_handler()
   *	IGS enabled check sysctl node handler.
   */
@@ -14,7 +38,7 @@
  {
  	int ret;
  	int current_value;
-@@ -8315,7 +8328,11 @@ static int ecm_interface_igs_enabled_han
+@@ -9254,7 +9267,11 @@ static int ecm_interface_igs_enabled_han
   * ecm_interface_src_check_handler()
   *	Source interface check sysctl node handler.
   */
@@ -26,32 +50,7 @@
  {
  	int ret;
  	int current_value;
---- a/ecm_interface.c
-+++ b/ecm_interface.c
-@@ -1398,6 +1398,10 @@ __be32 ecm_interface_vxlan_gpe_get_vni_
- 
- 		daddr = netif_is_vxlan(indev) ? ip_hdr(skb)->saddr : ip_hdr(skb)->daddr;
-+#if LINUX_VERSION_CODE < KERNEL_VERSION(6, 18, 0)
- 		rt = ip_route_output(&init_net, daddr, 0, 0, 0);
-+#else
-+		rt = ip_route_output(&init_net, daddr, 0, 0, 0, RT_SCOPE_UNIVERSE);
-+#endif
- 		if (IS_ERR_OR_NULL(rt)) {
- 			DEBUG_WARN("%px: VXLAN-GPE failed to get IPv4 route to: %pI4\n", dev, &daddr);
- 			goto rt_error;
-@@ -1721,7 +1725,11 @@ struct neighbour *ecm_interface_ipv4_nei
- 	__be32 ipv4_addr;
- 
- 	ECM_IP_ADDR_TO_NIN4_ADDR(ipv4_addr, addr);
-+#if LINUX_VERSION_CODE < KERNEL_VERSION(6, 18, 0)
- 	rt = ip_route_output(&init_net, ipv4_addr, 0, 0, 0);
-+#else
-+	rt = ip_route_output(&init_net, ipv4_addr, 0, 0, 0, RT_SCOPE_UNIVERSE);
-+#endif
- 	if (IS_ERR_OR_NULL(rt)) {
- 		return NULL;
- 	}
-@@ -9304,7 +9312,11 @@ static int ecm_interface_src_check_handl
+@@ -9295,7 +9312,11 @@ static int ecm_interface_src_check_handl
   * ecm_interface_src_check_no_flush_handler()
   *	Source interface check no flush sysctl node handler.
   */
@@ -63,7 +62,7 @@
  {
  	int ret;
  
-@@ -9328,8 +9340,13 @@ static int ecm_interface_src_check_no_fl
+@@ -9319,8 +9340,13 @@ static int ecm_interface_src_check_no_fl
   * ecm_interface_mwan3_enable_handler()
   *	 mwan3 enable check sysctl node handler.
   */
@@ -77,9 +76,9 @@
  {
  	int ret;
  	int current_value;
-@@ -9666,7 +9683,11 @@ static int ecm_interface_defunct_by_mac_
+@@ -9657,7 +9683,11 @@ static int ecm_interface_defunct_by_mac_
   * ecm_interface_defunct_by_mac_addr_handler()
-  *	Proc handler function for defunct_by_mac read/write operation.
+  * 	Proc handler function for defunct the ecm rules by mac address
   */
 +#if LINUX_VERSION_CODE < KERNEL_VERSION(6, 10, 0)
  static int ecm_interface_defunct_by_mac_address_handler(struct ctl_table *ctl, int write, void *buffer, size_t *lenp, loff_t *ppos)
@@ -88,10 +87,10 @@
 +#endif
  {
  	/*
- 	 * Usage:
+ 	 * To mark a MAC address as defunct:
 --- a/ecm_db/ecm_db_connection.c
 +++ b/ecm_db/ecm_db_connection.c
-@@ -698,7 +698,7 @@ EXPORT_SYMBOL(ecm_db_connection_node_add
+@@ -737,7 +737,7 @@ EXPORT_SYMBOL(ecm_db_connection_node_add
  void ecm_db_connection_iface_name_get(struct ecm_db_connection_instance *ci, ecm_db_obj_dir_t dir, char *name_buffer)
  {
  	DEBUG_CHECK_MAGIC(ci, ECM_DB_CONNECTION_INSTANCE_MAGIC, "%px: magic failed", ci);
@@ -102,7 +101,7 @@
  
 --- a/ecm_db/ecm_db_iface.c
 +++ b/ecm_db/ecm_db_iface.c
-@@ -247,7 +247,7 @@ static int ecm_db_iface_state_get_base(s
+@@ -250,7 +250,7 @@ static int ecm_db_iface_state_get_base(s
  	interface_identifier = ii->interface_identifier;
  	ae_interface_identifier = ii->ae_interface_identifier;
  	spin_lock_bh(&ecm_db_lock);
@@ -111,7 +110,7 @@
  	mtu = ii->mtu;
  	spin_unlock_bh(&ecm_db_lock);
  
-@@ -1178,7 +1178,7 @@ void ecm_db_iface_interface_name_get(str
+@@ -1241,7 +1241,7 @@ void ecm_db_iface_interface_name_get(str
  {
  	DEBUG_CHECK_MAGIC(ii,
  		ECM_DB_IFACE_INSTANCE_MAGIC, "%px: magic failed", ii);
@@ -120,7 +119,7 @@
  }
  EXPORT_SYMBOL(ecm_db_iface_interface_name_get);
  
-@@ -2708,7 +2708,7 @@ void ecm_db_iface_add_ethernet(struct ec
+@@ -2905,7 +2905,7 @@ void ecm_db_iface_add_ethernet(struct ec
  #endif
  	ii->arg = arg;
  	ii->final = final;
@@ -129,7 +128,7 @@
  	ii->mtu = mtu;
  	ii->interface_identifier = interface_identifier;
  	ii->ae_interface_identifier = ae_interface_identifier;
-@@ -2760,7 +2760,7 @@ void ecm_db_iface_add_lag(struct ecm_db_
+@@ -2957,7 +2957,7 @@ void ecm_db_iface_add_dsa(struct ecm_db_
  #endif
  	ii->arg = arg;
  	ii->final = final;
@@ -138,7 +137,7 @@
  	ii->mtu = mtu;
  	ii->interface_identifier = interface_identifier;
  	ii->ae_interface_identifier = ae_interface_identifier;
-@@ -2811,7 +2811,7 @@ void ecm_db_iface_add_bridge(struct ecm_
+@@ -3008,7 +3008,7 @@ void ecm_db_iface_add_lag(struct ecm_db_
  #endif
  	ii->arg = arg;
  	ii->final = final;
@@ -147,7 +146,7 @@
  	ii->mtu = mtu;
  	ii->interface_identifier = interface_identifier;
  	ii->ae_interface_identifier = ae_interface_identifier;
-@@ -2862,7 +2862,7 @@ void ecm_db_iface_add_ovs_bridge(struct
+@@ -3059,7 +3059,7 @@ void ecm_db_iface_add_bridge(struct ecm_
  #endif
  	ii->arg = arg;
  	ii->final = final;
@@ -156,7 +155,7 @@
  	ii->mtu = mtu;
  	ii->interface_identifier = interface_identifier;
  	ii->ae_interface_identifier = ae_interface_identifier;
-@@ -2913,7 +2913,7 @@ void ecm_db_iface_add_macvlan(struct ecm
+@@ -3110,7 +3110,7 @@ void ecm_db_iface_add_ovs_bridge(struct
  #endif
  	ii->arg = arg;
  	ii->final = final;
@@ -165,7 +164,7 @@
  	ii->mtu = mtu;
  	ii->interface_identifier = interface_identifier;
  	ii->ae_interface_identifier = ae_interface_identifier;
-@@ -2964,7 +2964,7 @@ void ecm_db_iface_add_vlan(struct ecm_db
+@@ -3159,7 +3159,7 @@ void ecm_db_iface_add_ovs_internal(struc
  #endif
  	ii->arg = arg;
  	ii->final = final;
@@ -174,7 +173,7 @@
  	ii->mtu = mtu;
  	ii->interface_identifier = interface_identifier;
  	ii->ae_interface_identifier = ae_interface_identifier;
-@@ -3018,7 +3018,7 @@ void ecm_db_iface_add_map_t(struct ecm_d
+@@ -3210,7 +3210,7 @@ void ecm_db_iface_add_macvlan(struct ecm
  #endif
  	ii->arg = arg;
  	ii->final = final;
@@ -183,7 +182,7 @@
  	ii->mtu = mtu;
  	ii->interface_identifier = interface_identifier;
  	ii->ae_interface_identifier = ae_interface_identifier;
-@@ -3070,7 +3070,7 @@ void ecm_db_iface_add_gre_tun(struct ecm
+@@ -3261,7 +3261,7 @@ void ecm_db_iface_add_vlan(struct ecm_db
  #endif
  	ii->arg = arg;
  	ii->final = final;
@@ -192,7 +191,7 @@
  	ii->mtu = mtu;
  	ii->interface_identifier = interface_identifier;
  	ii->ae_interface_identifier = ae_interface_identifier;
-@@ -3122,7 +3122,7 @@ void ecm_db_iface_add_pppoe(struct ecm_d
+@@ -3315,7 +3315,7 @@ void ecm_db_iface_add_map_t(struct ecm_d
  #endif
  	ii->arg = arg;
  	ii->final = final;
@@ -201,7 +200,7 @@
  	ii->mtu = mtu;
  	ii->interface_identifier = interface_identifier;
  	ii->ae_interface_identifier = ae_interface_identifier;
-@@ -3175,7 +3175,7 @@ void ecm_db_iface_add_pppol2tpv2(struct
+@@ -3367,7 +3367,7 @@ void ecm_db_iface_add_gre_tun(struct ecm
  #endif
  	ii->arg = arg;
  	ii->final = final;
@@ -210,7 +209,7 @@
  	ii->mtu = mtu;
  	ii->interface_identifier = interface_identifier;
  	ii->ae_interface_identifier = ae_interface_identifier;
-@@ -3228,7 +3228,7 @@ void ecm_db_iface_add_pptp(struct ecm_db
+@@ -3419,7 +3419,7 @@ void ecm_db_iface_add_pppoe(struct ecm_d
  #endif
  	ii->arg = arg;
  	ii->final = final;
@@ -219,7 +218,7 @@
  	ii->mtu = mtu;
  	ii->interface_identifier = interface_identifier;
  	ii->ae_interface_identifier = ae_interface_identifier;
-@@ -3278,7 +3278,7 @@ void ecm_db_iface_add_unknown(struct ecm
+@@ -3472,7 +3472,7 @@ void ecm_db_iface_add_pppol2tpv2(struct
  #endif
  	ii->arg = arg;
  	ii->final = final;
@@ -228,7 +227,7 @@
  	ii->mtu = mtu;
  	ii->interface_identifier = interface_identifier;
  	ii->ae_interface_identifier = ae_interface_identifier;
-@@ -3327,7 +3327,7 @@ void ecm_db_iface_add_loopback(struct ec
+@@ -3525,7 +3525,7 @@ void ecm_db_iface_add_pptp(struct ecm_db
  #endif
  	ii->arg = arg;
  	ii->final = final;
@@ -237,7 +236,7 @@
  	ii->mtu = mtu;
  	ii->interface_identifier = interface_identifier;
  	ii->ae_interface_identifier = ae_interface_identifier;
-@@ -3386,7 +3386,7 @@ void ecm_db_iface_add_sit(struct ecm_db_
+@@ -3575,7 +3575,7 @@ void ecm_db_iface_add_unknown(struct ecm
  #endif
  	ii->arg = arg;
  	ii->final = final;
@@ -246,7 +245,7 @@
  	ii->mtu = mtu;
  	ii->interface_identifier = interface_identifier;
  	ii->ae_interface_identifier = ae_interface_identifier;
-@@ -3436,7 +3436,7 @@ void ecm_db_iface_add_tunipip6(struct ec
+@@ -3624,7 +3624,7 @@ void ecm_db_iface_add_loopback(struct ec
  #endif
  	ii->arg = arg;
  	ii->final = final;
@@ -255,7 +254,7 @@
  	ii->mtu = mtu;
  	ii->interface_identifier = interface_identifier;
  	ii->ae_interface_identifier = ae_interface_identifier;
-@@ -3489,7 +3489,7 @@ void ecm_db_iface_add_ipsec_tunnel(struc
+@@ -3683,7 +3683,7 @@ void ecm_db_iface_add_sit(struct ecm_db_
  #endif
  	ii->arg = arg;
  	ii->final = final;
@@ -264,7 +263,7 @@
  	ii->mtu = mtu;
  	ii->interface_identifier = interface_identifier;
  	ii->ae_interface_identifier = ae_interface_identifier;
-@@ -3541,7 +3541,7 @@ void ecm_db_iface_add_rawip(struct ecm_d
+@@ -3733,7 +3733,7 @@ void ecm_db_iface_add_tunipip6(struct ec
  #endif
  	ii->arg = arg;
  	ii->final = final;
@@ -273,7 +272,7 @@
  	ii->mtu = mtu;
  	ii->interface_identifier = interface_identifier;
  	ii->ae_interface_identifier = ae_interface_identifier;
-@@ -3592,7 +3592,7 @@ void ecm_db_iface_add_ovpn(struct ecm_db
+@@ -3889,7 +3889,7 @@ void ecm_db_iface_add_ovpn(struct ecm_db
  #endif
  	ii->arg = arg;
  	ii->final = final;
@@ -282,7 +281,7 @@
  	ii->mtu = mtu;
  	ii->interface_identifier = interface_identifier;
  	ii->ae_interface_identifier = type_info->tun_ifnum;
-@@ -3643,7 +3643,7 @@ void ecm_db_iface_add_vxlan(struct ecm_d
+@@ -3940,7 +3940,7 @@ void ecm_db_iface_add_vxlan(struct ecm_d
  #endif
  	ii->arg = arg;
  	ii->final = final;
@@ -293,7 +292,7 @@
  	ii->ae_interface_identifier = ae_interface_identifier;
 --- a/ecm_tracker_udp.c
 +++ b/ecm_tracker_udp.c
-@@ -1160,7 +1160,11 @@ static bool ecm_tracker_udp_datagram_dis
+@@ -1160,7 +1160,11 @@ static int ecm_tracker_rtp_payload_types
   * ecm_tracker_udp_rtp_payload_types_handler()
   *	Proc handler function for RTP payload types read/write operation.
   */
@@ -327,7 +326,7 @@
  #include <linux/module.h>
  #include <linux/of.h>
  #include <linux/debugfs.h>
-@@ -895,7 +896,11 @@ int ecm_front_end_ppe_fse_enable_handler
+@@ -947,7 +948,11 @@ int ecm_front_end_ppe_fse_enable_handler
   * ecm_front_end_db_conn_limit_handler()
   *	Database connection limit sysctl node handler.
   */
@@ -339,7 +338,7 @@
  {
  	int ret;
  	int current_value;
-@@ -1114,7 +1119,11 @@ static int ecm_front_end_denied_ports_ha
+@@ -1166,7 +1171,11 @@ static int ecm_front_end_denied_ports_ha
   * ecm_front_end_udp_denied_ports_handler()
   *	Proc handler function for UDP denied ports read/write operation.
   */
@@ -352,7 +351,7 @@
  {
  	/*
  	 * Usage:
-@@ -1134,7 +1143,11 @@ static int ecm_front_end_udp_denied_port
+@@ -1186,7 +1195,11 @@ static int ecm_front_end_udp_denied_port
   * ecm_front_end_tcp_denied_ports_handler()
   *	Proc handler function for TCP denied ports read/write operation.
   */
@@ -377,7 +376,7 @@
  			DEBUG_TRACE("%px: VLAN - unsupported\n", feci);
 --- a/frontends/sfe/ecm_sfe_common.c
 +++ b/frontends/sfe/ecm_sfe_common.c
-@@ -308,7 +308,11 @@ void ecm_sfe_common_fast_xmit_set(uint32
+@@ -347,7 +347,11 @@ void ecm_sfe_common_fast_xmit_set(uint32
   * ecm_sfe_fast_xmit_enable_handler()
   *	Fast transmit sysctl node handler.
   */
@@ -389,7 +388,7 @@
  {
  	int ret;
  
-@@ -332,7 +336,11 @@ int ecm_sfe_fast_xmit_enable_handler(str
+@@ -371,7 +375,11 @@ int ecm_sfe_fast_xmit_enable_handler(str
   * ecm_sfe_fse_enable_handler()
   *	Sysctl to enable/disable FSE programming through ECM SFE frontend.
   */
@@ -401,8 +400,7 @@
  {
  	int ret;
  	int current_val;
-@@ -552,7 +552,7 @@ static struct ctl_table ecm_sfe_sysctl_t
- /*
+@@ -546,7 +554,7 @@ static struct ctl_table ecm_sfe_sysctl_t
   * ecm_sfe_sysctl_tbl_init()
   * 	Register sysctl for SFE
   */
@@ -411,15 +409,6 @@
  {
  	ecm_sfe_ctl_tbl_hdr = register_sysctl(ECM_FRONT_END_SYSCTL_PATH, ecm_sfe_sysctl_tbl);
  	if (!ecm_sfe_ctl_tbl_hdr) {
-@@ -489,7 +496,7 @@ int ecm_sfe_sysctl_tbl_init()
-  * ecm_sfe_sysctl_tbl_exit()
-  * 	Unregister sysctl for SFE
-  */
--void ecm_sfe_sysctl_tbl_exit()
-+void ecm_sfe_sysctl_tbl_exit(void)
- {
- 	if (ecm_sfe_ctl_tbl_hdr) {
- 		unregister_sysctl_table(ecm_sfe_ctl_tbl_hdr);
 --- a/ecm_classifier_hyfi.c
 +++ b/ecm_classifier_hyfi.c
 @@ -437,7 +437,7 @@ static void ecm_classifier_hyfi_get_brid
@@ -506,7 +495,7 @@
  		goto sscanf_read_error;
 --- a/Makefile
 +++ b/Makefile
-@@ -541,4 +541,10 @@ endif
+@@ -567,4 +567,10 @@ endif
  
  ccflags-y += -Wall -Werror
  
