@@ -1,14 +1,3 @@
---- a/clmapmgr/nss_clmapmgr.c
-+++ b/clmapmgr/nss_clmapmgr.c
-@@ -103,7 +103,7 @@ static struct rtnl_link_stats64 *nss_clm
- 	 * Netdev seems to be incrementing rx_dropped because we don't give IP header.
- 	 * So reset it as it's of no use for us.
- 	 */
--	atomic_long_set(&dev->rx_dropped, 0);
-+	atomic_long_set(&(dev)->stats.__rx_dropped, 0);
- 	priv = netdev_priv(dev);
- 	memset(stats, 0, sizeof(struct rtnl_link_stats64));
- 	memcpy(stats, &priv->stats, sizeof(struct rtnl_link_stats64));
 --- a/gre/nss_connmgr_gre.c
 +++ b/gre/nss_connmgr_gre.c
 @@ -279,10 +279,10 @@ static struct rtnl_link_stats64 *nss_con
@@ -53,28 +42,6 @@
  }
  
  /*
---- a/ipsecmgr/v1.0/nss_ipsecmgr.c
-+++ b/ipsecmgr/v1.0/nss_ipsecmgr.c
-@@ -447,7 +447,7 @@ static void nss_ipsecmgr_tunnel_setup(st
- 	/*
- 	 * get the MAC address from the ethernet device
- 	 */
--	random_ether_addr(dev->dev_addr);
-+	eth_random_addr((u8 *) dev->dev_addr);
- 
- 	memset(dev->broadcast, 0xff, dev->addr_len);
- 	memcpy(dev->perm_addr, dev->dev_addr, dev->addr_len);
---- a/ipsecmgr/v2.0/nss_ipsecmgr_tunnel.c
-+++ b/ipsecmgr/v2.0/nss_ipsecmgr_tunnel.c
-@@ -445,7 +445,7 @@ static void nss_ipsecmgr_tunnel_setup(st
- 	/*
- 	 * Get the MAC address from the ethernet device
- 	 */
--	random_ether_addr(dev->dev_addr);
-+	eth_random_addr((u8 *) dev->dev_addr);
- 
- 	memset(dev->broadcast, 0xff, dev->addr_len);
- 	memcpy(dev->perm_addr, dev->dev_addr, dev->addr_len);
 --- a/netlink/nss_nlgre_redir_cmn.c
 +++ b/netlink/nss_nlgre_redir_cmn.c
 @@ -384,7 +384,7 @@ static int nss_nlgre_redir_cmn_set_mac_a
@@ -198,41 +165,6 @@
  
  	/*
  	 * Update qdisc->qstats
---- a/pvxlanmgr/nss_pvxlanmgr.c
-+++ b/pvxlanmgr/nss_pvxlanmgr.c
-@@ -177,7 +177,7 @@ static struct rtnl_link_stats64 *nss_pvx
- 	 * Netdev seems to be incrementing rx_dropped because we don't give IP header.
- 	 * So reset it as it's of no use for us.
- 	 */
--	atomic_long_set(&dev->rx_dropped, 0);
-+	atomic_long_set(&(dev)->stats.__rx_dropped, 0);
- 	priv = netdev_priv(dev);
- 	memset(stats, 0, sizeof(struct rtnl_link_stats64));
- 	memcpy(stats, &priv->stats, sizeof(struct rtnl_link_stats64));
-@@ -305,9 +305,9 @@ static void nss_pvxlanmgr_dummy_netdev_s
- 	dev->priv_destructor = NULL;
- #endif
- 
--	memcpy(dev->dev_addr, "\x00\x00\x00\x00\x00\x00", dev->addr_len);
--	memset(dev->broadcast, 0xff, dev->addr_len);
--	memcpy(dev->perm_addr, dev->dev_addr, dev->addr_len);
-+	const uint8_t mac_addr[ETH_ALEN] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
-+	eth_hw_addr_set(dev, mac_addr);
-+	eth_broadcast_addr(dev->broadcast);
- }
- 
- /*
---- a/tls/nss_tlsmgr_tun.c
-+++ b/tls/nss_tlsmgr_tun.c
-@@ -179,7 +179,7 @@ static void nss_tlsmgr_tun_setup(struct
- 	/*
- 	 * Get the MAC address from the ethernet device
- 	 */
--	random_ether_addr(dev->dev_addr);
-+	eth_random_addr((u8 *) dev->dev_addr);
- 
- 	memset(dev->broadcast, 0xff, dev->addr_len);
- 	memcpy(dev->perm_addr, dev->dev_addr, dev->addr_len);
 --- a/tunipip6/nss_connmgr_tunipip6.c
 +++ b/tunipip6/nss_connmgr_tunipip6.c
 @@ -354,11 +354,11 @@ static void nss_tunipip6_update_dev_stat

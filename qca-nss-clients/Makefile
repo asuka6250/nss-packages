@@ -55,15 +55,6 @@ else
   SOC=$(CONFIG_TARGET_BOARD)
 endif
 
-ifneq (, $(findstring $(subtarget), "ipq807x" "ipq807x_64" "ipq60xx" "ipq60xx_64" "ipq50xx" "ipq50xx_64"))
-# DTLS Manager v2.0 for Hawkeye/Cypress
-  DTLSMGR_DIR:=v2.0
-# IPsec Manager v2.0 for Hawkeye/Cypress
-  IPSECMGR_DIR:=v2.0
-# KLIPS plugin
-  # IPSECMGR_KLIPS:= $(PKG_BUILD_DIR)/ipsecmgr/$(IPSECMGR_DIR)/plugins/klips/qca-nss-ipsec-klips.ko
-endif
-
 define KernelPackage/qca-nss-drv-tun6rd
   SECTION:=kernel
   CATEGORY:=Kernel modules
@@ -544,8 +535,6 @@ define Build/Compile
 	  ARCH="$(LINUX_KARCH)" \
 	  M="$(PKG_BUILD_DIR)" \
 	  EXTRA_CFLAGS="$(EXTRA_CFLAGS) -include $(PKG_BUILD_DIR)/compat.h" \
-	  DTLSMGR_DIR="$(DTLSMGR_DIR)" \
-	  IPSECMGR_DIR="$(IPSECMGR_DIR)" \
 	  SoC=$(SOC) \
 	  $(KERNEL_MAKE_FLAGS) \
 	  $(PKG_JOBS) \

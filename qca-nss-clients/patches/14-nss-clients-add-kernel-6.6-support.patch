@@ -247,17 +247,6 @@
  	if (!nss_mirror_ctl_header) {
  		nss_mirror_warn("Creating sysctl directory table header for mirror failed\n");
  		return -1;
---- a/l2tp/l2tpv2/nss_connmgr_l2tpv2.c
-+++ b/l2tp/l2tpv2/nss_connmgr_l2tpv2.c
-@@ -1030,7 +1030,7 @@ int __init nss_connmgr_l2tpv2_init_modul
- 	}
- #endif
- #if defined(NSS_L2TP_IPSEC_BIND_BY_NETDEV)
--	ctl_tbl_hdr = register_sysctl_table(nss_connmgr_l2tpv2_sysroot);
-+	ctl_tbl_hdr = register_sysctl("dev/nss/l2tpv2", nss_connmgr_l2tpv2_table);
- 	if (!ctl_tbl_hdr) {
- 		nss_connmgr_l2tpv2_info("Unable to register sysctl table for L2TP conn mgr\n");
- 		return -EFAULT;
 --- a/netlink/nss_nl.c
 +++ b/netlink/nss_nl.c
 @@ -475,7 +475,11 @@ struct nss_nlcmn *nss_nl_get_msg(struct

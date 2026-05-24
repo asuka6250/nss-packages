@@ -41,17 +41,6 @@
  };
  
  /*
---- a/clmapmgr/nss_clmapmgr.c
-+++ b/clmapmgr/nss_clmapmgr.c
-@@ -185,7 +185,7 @@ static void nss_clmapmgr_setup(struct ne
- {
- 	char name[IFNAMSIZ] = {0};
- 
--	strlcpy(name, "nssclmap%d", IFNAMSIZ);
-+	strscpy(name, "nssclmap%d", IFNAMSIZ);
- 	memcpy(dev->name, name, IFNAMSIZ);
- 	dev->netdev_ops = &nss_clmapmgr_ops;
- 	eth_hw_addr_random(dev);
 --- /dev/null
 +++ b/compat.h
 @@ -0,0 +1,26 @@
@@ -81,20 +70,6 @@
 +#endif
 +
 +#endif /* _COMPAT_H */
---- a/dtls/v2.0/nss_dtlsmgr_ctx_dev.c
-+++ b/dtls/v2.0/nss_dtlsmgr_ctx_dev.c
-@@ -278,7 +278,11 @@ void nss_dtlsmgr_ctx_dev_rx_outer(struct
- 		skb_set_transport_header(skb, sizeof(struct iphdr));
- 
- 		iph = ip_hdr(skb);
-+#if LINUX_VERSION_CODE <= KERNEL_VERSION(6, 10, 0)
- 		rt = ip_route_output(&init_net, iph->daddr, iph->saddr, 0, 0);
-+#else
-+		rt = ip_route_output(&init_net, iph->daddr, iph->saddr, 0, 0, 0);
-+#endif
- 		if (IS_ERR(rt)) {
- 			nss_dtlsmgr_warn("%px: No IPv4 route or out dev", dev);
- 			dev_kfree_skb_any(skb);
 --- a/gre/nss_connmgr_gre.c
 +++ b/gre/nss_connmgr_gre.c
 @@ -40,6 +40,12 @@
@@ -287,86 +262,6 @@
  			daddr_valid = true;
  			continue;
  		}
---- a/ipsecmgr/v1.0/nss_ipsecmgr.c
-+++ b/ipsecmgr/v1.0/nss_ipsecmgr.c
-@@ -528,7 +528,11 @@ static struct net_device *nss_ipsecmgr_t
- 		}
- 
- 		if (!is_encap) {
-+#if LINUX_VERSION_CODE <= KERNEL_VERSION(6, 10, 0)
- 			rt = ip_route_output(&init_net, iph->saddr, 0, 0, 0);
-+#else
-+			rt = ip_route_output(&init_net, iph->saddr, 0, 0, 0, 0);
-+#endif
- 			if (IS_ERR(rt)) {
- 				return NULL;
- 			}
---- a/ipsecmgr/v1.0/nss_ipsecmgr_flow.c
-+++ b/ipsecmgr/v1.0/nss_ipsecmgr_flow.c
-@@ -915,7 +915,11 @@ bool nss_ipsecmgr_flow_process_pmtu(stru
- 		if (unlikely(skb_dst(skb)))
- 			goto send_icmp;
- 
-+#if LINUX_VERSION_CODE <= KERNEL_VERSION(6, 10, 0)
- 		rt = ip_route_output(&init_net, ip_hdr(skb)->daddr, 0, 0, 0);
-+#else
-+		rt = ip_route_output(&init_net, ip_hdr(skb)->daddr, 0, 0, 0, 0);
-+#endif
- 		if (IS_ERR(rt)) {
- 			return false;
- 		}
---- a/ipsecmgr/v2.0/nss_ipsecmgr_ctx.c
-+++ b/ipsecmgr/v2.0/nss_ipsecmgr_ctx.c
-@@ -230,7 +230,11 @@ static void nss_ipsecmgr_ctx_notify_ipv4
- 	 * flow that coming in for the first time. We should query
- 	 * the Linux to see the associated NETDEV
- 	 */
-+#if LINUX_VERSION_CODE <= KERNEL_VERSION(6, 10, 0)
- 	rt = ip_route_output(&init_net, iph->saddr, 0, 0, 0);
-+#else
-+	rt = ip_route_output(&init_net, iph->saddr, 0, 0, 0, 0);
-+#endif
- 	if (IS_ERR(rt)) {
- 		dev_kfree_skb_any(skb);
- 		ctx->hstats.v4_notify_drop++;
-@@ -258,7 +262,11 @@ static void nss_ipsecmgr_ctx_route_ipv4(
- 	struct iphdr *iph = ip_hdr(skb);
- 	struct rtable *rt;
- 
-+#if LINUX_VERSION_CODE <= KERNEL_VERSION(6, 10, 0)
- 	rt = ip_route_output(&init_net, iph->daddr, iph->saddr, 0, 0);
-+#else
-+	rt = ip_route_output(&init_net, iph->daddr, iph->saddr, 0, 0, 0);
-+#endif
- 	if (unlikely(IS_ERR(rt))) {
- 		nss_ipsecmgr_warn("%pK: No route, drop packet.\n", skb);
- 		dev_kfree_skb_any(skb);
---- a/ipsecmgr/v2.0/plugins/xfrm/nss_ipsec_xfrm_tunnel.c
-+++ b/ipsecmgr/v2.0/plugins/xfrm/nss_ipsec_xfrm_tunnel.c
-@@ -149,7 +149,11 @@ static void nss_ipsec_xfrm_tunnel_rx_out
- 	if (ip_hdr(skb)->version == IPVERSION) {
- 		struct iphdr *iph = ip_hdr(skb);
- 
-+#if LINUX_VERSION_CODE <= KERNEL_VERSION(6, 10, 0)
- 		struct rtable *rt = ip_route_output(&init_net, iph->daddr, iph->saddr, 0, 0);
-+#else
-+		struct rtable *rt = ip_route_output(&init_net, iph->daddr, iph->saddr, 0, 0, 0);
-+#endif
- 		if (unlikely(IS_ERR(rt))) {
- 			nss_ipsec_xfrm_warn("%px: Failed to handle ipv4 exception after encap; No route\n", skb);
- 			goto drop;
-@@ -285,7 +289,11 @@ struct nss_ipsec_xfrm_tunnel *nss_ipsec_
- 
- 	switch (family) {
- 	case AF_INET:
-+#if LINUX_VERSION_CODE <= KERNEL_VERSION(6, 10, 0)
- 		 rt = ip_route_output(&init_net, remote->a4, 0, 0, 0);
-+#else
-+		 rt = ip_route_output(&init_net, remote->a4, 0, 0, 0, 0);
-+#endif
- 		 if (IS_ERR(rt)) {
- 			 nss_ipsec_xfrm_err("%p:Failed to allocate tunnel; No IPv4 dst found\n", drv);
- 			 return NULL;
 --- a/l2tp/l2tpv2/nss_connmgr_l2tpv2.c
 +++ b/l2tp/l2tpv2/nss_connmgr_l2tpv2.c
 @@ -319,7 +319,7 @@ static struct nss_connmgr_l2tpv2_session
@@ -409,26 +304,6 @@
  };
  
  /*
-@@ -991,8 +994,7 @@ static struct ctl_table nss_connmgr_l2tp
- 		.procname		= "l2tpv2",
- 		.mode			= 0555,
- 		.child			= nss_connmgr_l2tpv2_table,
--	},
--	{ }
-+	}
- };
- 
- /*
-@@ -1003,8 +1005,7 @@ static struct ctl_table nss_connmgr_l2tp
- 		.procname		= "nss",
- 		.mode			= 0555,
- 		.child			= nss_connmgr_l2tpv2_dir,
--	},
--	{ }
-+	}
- };
- #endif
- 
 --- a/l2tp/l2tpv2/nss_l2tpv2_stats.c
 +++ b/l2tp/l2tpv2/nss_l2tpv2_stats.c
 @@ -129,7 +129,11 @@ void nss_l2tpv2_update_dev_stats(struct
@@ -530,28 +405,6 @@
  };
  
  /*
---- a/netlink/nss_nldtls.c
-+++ b/netlink/nss_nldtls.c
-@@ -1108,7 +1108,7 @@ static ssize_t nss_nldtls_tunnel_stats_r
- 	list_for_each_entry(entry, &gbl_ctx.dtls_list_head, list) {
- 		spin_lock_bh(&gbl_ctx.lock);
- 		memcpy(&stats, &entry->stats, sizeof(stats));
--		strlcpy(dev_name, entry->dev_name, IFNAMSIZ);
-+		strscpy(dev_name, entry->dev_name, IFNAMSIZ);
- 		spin_unlock_bh(&gbl_ctx.lock);
- 
- 		size_wr += scnprintf(lbuf + size_wr, size_al - size_wr, "\n--------------------------------");
---- a/netlink/nss_nlipsec.c
-+++ b/netlink/nss_nlipsec.c
-@@ -394,7 +394,7 @@ static int nss_nlipsec_op_create_tunnel(
- 	 * the tunnel I/F name into the same rule and send it
- 	 * as part of the response for the create operation
- 	 */
--	strlcpy(nl_rule->ifname, dev->name, IFNAMSIZ);
-+	strscpy(nl_rule->ifname, dev->name, IFNAMSIZ);
- 
- 	/*
- 	 * Send to userspace
 --- a/netlink/nss_nlipv4.c
 +++ b/netlink/nss_nlipv4.c
 @@ -129,7 +129,11 @@ static struct neighbour *nss_nlipv4_get_
@@ -675,48 +528,6 @@
  		nss_qdisc_info("Detaching old: %px\n", *old);
  		nim_detach.msg.shaper_configure.config.msg.shaper_node_config.qos_tag = cl->nq.qos_tag;
  		if (nss_qdisc_node_detach(&cl->nq, nq_child, &nim_detach,
---- a/openvpn/plugins/nss_ovpn_sk.c
-+++ b/openvpn/plugins/nss_ovpn_sk.c
-@@ -225,7 +225,11 @@ static int nss_ovpn_sk_update_ipv4_tuple
- {
- 	struct rtable *rt;
- 
-+#if LINUX_VERSION_CODE <= KERNEL_VERSION(6, 10, 0)
- 	rt = ip_route_output(dev_net(pinfo->dev), tun_data->tun_hdr.dst_ip[0], 0, 0, 0);
-+#else
-+	rt = ip_route_output(dev_net(pinfo->dev), tun_data->tun_hdr.dst_ip[0], 0, 0, 0, 0);
-+#endif
- 	if (unlikely(IS_ERR(rt))) {
- 		nss_ovpn_sk_warn("%px: Failed to find IPv4 route.\n", pinfo);
- 		return -EINVAL;
---- a/openvpn/src/nss_ovpnmgr_app.c
-+++ b/openvpn/src/nss_ovpnmgr_app.c
-@@ -51,7 +51,11 @@ static struct net_device *nss_ovpnmgr_ap
- 	struct rtable *rt4;
- 
- 	if (rt->ip_version == IPVERSION) {
-+#if LINUX_VERSION_CODE <= KERNEL_VERSION(6, 10, 0)
- 		rt4 = ip_route_output(&init_net, rt->ip_addr[0], 0, 0, 0);
-+#else
-+		rt4 = ip_route_output(&init_net, rt->ip_addr[0], 0, 0, 0, 0);
-+#endif
- 		if (IS_ERR(rt4)) {
- 			return NULL;
- 		}
---- a/openvpn/src/nss_ovpnmgr_tun.c
-+++ b/openvpn/src/nss_ovpnmgr_tun.c
-@@ -69,7 +69,11 @@ static void nss_ovpnmgr_tun_ipv4_forward
- 	skb_reset_network_header(skb);
- 	iph = ip_hdr(skb);
- 
-+#if LINUX_VERSION_CODE <= KERNEL_VERSION(6, 10, 0)
- 	rt = ip_route_output(dev_net(app->dev), iph->daddr, iph->saddr, 0, 0);
-+#else
-+	rt = ip_route_output(dev_net(app->dev), iph->daddr, iph->saddr, 0, 0, 0);
-+#endif
- 	if (unlikely(IS_ERR(rt))) {
- 		nss_ovpnmgr_warn("%px: Failed to find IPv4 route.\n", skb);
- 		tun->outer.stats.host_pkt_drop++;
 --- a/portifmgr/nss_portifmgr.c
 +++ b/portifmgr/nss_portifmgr.c
 @@ -266,7 +266,7 @@ struct net_device *nss_portifmgr_create_

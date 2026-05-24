@@ -625,26 +625,6 @@
  };
  MODULE_DEVICE_TABLE(of, nss_dt_ids);
  #endif
---- a/nss_ipsec_cmn_log.c
-+++ b/nss_ipsec_cmn_log.c
-@@ -20,6 +20,7 @@
-  */
- 
- #include "nss_core.h"
-+#include "nss_ipsec_cmn_log.h"
- 
- #define NSS_IPSEC_LOG_IPV4 4
- #define NSS_IPSEC_LOG_IPV6 6
---- a/nss_ipsec_log.c
-+++ b/nss_ipsec_log.c
-@@ -20,6 +20,7 @@
-  */
- 
- #include "nss_core.h"
-+#include "nss_ipsec_log.h"
- 
- #define NSS_IPSEC_LOG_IPV4 4
- #define NSS_IPSEC_LOG_IPV6 6
 --- a/nss_ipv4_reasm_strings.c
 +++ b/nss_ipv4_reasm_strings.c
 @@ -20,6 +20,7 @@
