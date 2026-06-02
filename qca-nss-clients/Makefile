@@ -534,7 +534,7 @@ define Build/Compile
 	  CROSS_COMPILE="$(TARGET_CROSS)" \
 	  ARCH="$(LINUX_KARCH)" \
 	  M="$(PKG_BUILD_DIR)" \
-	  EXTRA_CFLAGS="$(EXTRA_CFLAGS) -include $(PKG_BUILD_DIR)/compat.h" \
+	  EXTRA_CFLAGS="$(EXTRA_CFLAGS)" \
 	  SoC=$(SOC) \
 	  $(KERNEL_MAKE_FLAGS) \
 	  $(PKG_JOBS) \

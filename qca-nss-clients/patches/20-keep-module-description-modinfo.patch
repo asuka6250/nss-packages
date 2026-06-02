@@ -1,0 +1,137 @@
+--- a/bridge/nss_bridge_mgr.c
++++ b/bridge/nss_bridge_mgr.c
+@@ -1662,6 +1662,7 @@ module_exit(nss_bridge_mgr_exit_module);
+ 
+ MODULE_LICENSE("Dual BSD/GPL");
+ MODULE_DESCRIPTION("NSS bridge manager");
++MODULE_INFO(description, "NSS bridge manager");
+ 
+ module_param(ovs_enabled, bool, 0644);
+ MODULE_PARM_DESC(ovs_enabled, "OVS bridge is enabled");
+--- a/eogremgr/nss_eogremgr.c
++++ b/eogremgr/nss_eogremgr.c
+@@ -585,3 +585,4 @@ module_exit(nss_eogremgr_exit_module);
+ 
+ MODULE_LICENSE("Dual BSD/GPL");
+ MODULE_DESCRIPTION("NSS EOGRE manager");
++MODULE_INFO(description, "NSS EOGRE manager");
+--- a/gre/nss_connmgr_gre.c
++++ b/gre/nss_connmgr_gre.c
+@@ -1865,3 +1865,4 @@ module_exit(nss_connmgr_gre_exit_module)
+ 
+ MODULE_LICENSE("Dual BSD/GPL");
+ MODULE_DESCRIPTION("NSS gre offload manager");
++MODULE_INFO(description, "NSS gre offload manager");
+--- a/gre/test/nss_connmgr_gre_test.c
++++ b/gre/test/nss_connmgr_gre_test.c
+@@ -270,3 +270,4 @@ module_exit(nss_connmgr_gre_test_exit_mo
+ 
+ MODULE_LICENSE("Dual BSD/GPL");
+ MODULE_DESCRIPTION("NSS gre test module");
++MODULE_INFO(description, "NSS gre test module");
+--- a/lag/nss_lag.c
++++ b/lag/nss_lag.c
+@@ -378,3 +378,4 @@ module_exit(nss_lag_exit);
+ 
+ MODULE_LICENSE("Dual BSD/GPL");
+ MODULE_DESCRIPTION("NSS LAG Client");
++MODULE_INFO(description, "NSS LAG Client");
+--- a/l2tp/l2tpv2/nss_connmgr_l2tpv2.c
++++ b/l2tp/l2tpv2/nss_connmgr_l2tpv2.c
+@@ -1068,3 +1068,4 @@ module_exit(nss_connmgr_l2tpv2_exit_modu
+ 
+ MODULE_LICENSE("Dual BSD/GPL");
+ MODULE_DESCRIPTION("NSS l2tpv2 over ppp offload manager");
++MODULE_INFO(description, "NSS l2tpv2 over ppp offload manager");
+--- a/map/map-t/nss_connmgr_map_t.c
++++ b/map/map-t/nss_connmgr_map_t.c
+@@ -1101,3 +1101,4 @@ module_exit(nss_connmgr_map_t_exit_modul
+ 
+ MODULE_LICENSE("Dual BSD/GPL");
+ MODULE_DESCRIPTION("NSS map_t offload manager");
++MODULE_INFO(description, "NSS map_t offload manager");
+--- a/match/nss_match.c
++++ b/match/nss_match.c
+@@ -523,3 +523,4 @@ module_exit(nss_match_exit_module);
+ 
+ MODULE_LICENSE("Dual BSD/GPL");
+ MODULE_DESCRIPTION("NSS match client");
++MODULE_INFO(description, "NSS match client");
+--- a/mirror/nss_mirror_init.c
++++ b/mirror/nss_mirror_init.c
+@@ -59,3 +59,4 @@ module_exit(nss_mirror_module_exit);
+ 
+ MODULE_LICENSE("Dual BSD/GPL");
+ MODULE_DESCRIPTION("NSS MIRROR Client");
++MODULE_INFO(description, "NSS MIRROR Client");
+--- a/netlink/nss_nl.c
++++ b/netlink/nss_nl.c
+@@ -582,4 +582,5 @@ module_init(nss_nl_init);
+ module_exit(nss_nl_exit);
+ 
+ MODULE_DESCRIPTION("NSS NETLINK");
++MODULE_INFO(description, "NSS NETLINK");
+ MODULE_LICENSE("Dual BSD/GPL");
+--- a/nss_connmgr_tun6rd.c
++++ b/nss_connmgr_tun6rd.c
+@@ -499,3 +499,4 @@ module_exit(nss_tun6rd_exit_module);
+ 
+ MODULE_LICENSE("Dual BSD/GPL");
+ MODULE_DESCRIPTION("NSS tun6rd offload manager");
++MODULE_INFO(description, "NSS tun6rd offload manager");
+--- a/nss_qdisc/igs/nss_mirred.c
++++ b/nss_qdisc/igs/nss_mirred.c
+@@ -756,3 +756,4 @@ module_init(nss_mirred_init_module);
+ module_exit(nss_mirred_cleanup_module);
+ 
+ MODULE_LICENSE("Dual BSD/GPL");
++MODULE_INFO(description, "NSS mirred action client");
+--- a/nss_qdisc/nss_qdisc.c
++++ b/nss_qdisc/nss_qdisc.c
+@@ -2942,3 +2942,4 @@ module_init(nss_qdisc_module_init)
+ module_exit(nss_qdisc_module_exit)
+ 
+ MODULE_LICENSE("Dual BSD/GPL");
++MODULE_INFO(description, "NSS qdisc client");
+--- a/pppoe/nss_connmgr_pppoe.c
++++ b/pppoe/nss_connmgr_pppoe.c
+@@ -439,3 +439,4 @@ module_exit(nss_connmgr_pppoe_exit_modul
+ 
+ MODULE_LICENSE("Dual BSD/GPL");
+ MODULE_DESCRIPTION("NSS pppoe offload manager");
++MODULE_INFO(description, "NSS pppoe offload manager");
+--- a/pptp/nss_connmgr_pptp.c
++++ b/pptp/nss_connmgr_pptp.c
+@@ -889,3 +889,4 @@ module_exit(nss_connmgr_pptp_exit_module
+ 
+ MODULE_LICENSE("Dual BSD/GPL");
+ MODULE_DESCRIPTION("NSS pptp offload manager");
++MODULE_INFO(description, "NSS pptp offload manager");
+--- a/tunipip6/nss_connmgr_tunipip6.c
++++ b/tunipip6/nss_connmgr_tunipip6.c
+@@ -1181,3 +1181,4 @@ module_exit(nss_tunipip6_exit_module);
+ 
+ MODULE_LICENSE("Dual BSD/GPL");
+ MODULE_DESCRIPTION("NSS tunipip6 offload manager");
++MODULE_INFO(description, "NSS tunipip6 offload manager");
+--- a/vlan/nss_vlan_mgr.c
++++ b/vlan/nss_vlan_mgr.c
+@@ -1960,3 +1960,4 @@ module_exit(nss_vlan_mgr_exit_module);
+ 
+ MODULE_LICENSE("Dual BSD/GPL");
+ MODULE_DESCRIPTION("NSS vlan manager");
++MODULE_INFO(description, "NSS vlan manager");
+--- a/vxlanmgr/nss_vxlanmgr.c
++++ b/vxlanmgr/nss_vxlanmgr.c
+@@ -225,3 +225,4 @@ module_exit(nss_vxlanmgr_exit_module);
+ 
+ MODULE_LICENSE("Dual BSD/GPL");
+ MODULE_DESCRIPTION("NSS VxLAN manager");
++MODULE_INFO(description, "NSS VxLAN manager");
+--- a/wifi_meshmgr/nss_wifi_meshmgr.c
++++ b/wifi_meshmgr/nss_wifi_meshmgr.c
+@@ -2000,3 +2000,4 @@ module_exit(nss_wifi_meshmgr_exit_module
+ 
+ MODULE_LICENSE("Dual BSD/GPL");
+ MODULE_DESCRIPTION("NSS WiFi-Mesh manager");
++MODULE_INFO(description, "NSS WiFi-Mesh manager");

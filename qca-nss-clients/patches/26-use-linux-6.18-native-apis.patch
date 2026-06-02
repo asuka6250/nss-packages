@@ -1,0 +1,202 @@
+--- a/netlink/nss_nloam.c
++++ b/netlink/nss_nloam.c
+@@ -164,7 +164,7 @@ static int nss_nloam_get_fw_post_resp(vo
+ 		goto fail;
+ 	}
+ 
+-	strlcpy((char *)get_resp->bin, nom->msg.fw_ver.string, NSS_OAM_FW_VERSION_LEN);
++	strscpy((char *)get_resp->bin, nom->msg.fw_ver.string, NSS_OAM_FW_VERSION_LEN);
+ 	get_resp->bin[NSS_OAM_FW_VERSION_LEN - 1] = '\0';
+ 	get_resp->error_no = 0;
+ 
+--- a/l2tp/l2tpv2/nss_connmgr_l2tpv2.c
++++ b/l2tp/l2tpv2/nss_connmgr_l2tpv2.c
+@@ -982,29 +982,6 @@ static struct ctl_table nss_connmgr_l2tp
+ 	}
+ };
+ 
+-/*
+- * nss_connmgr_l2tpv2_dir
+- */
+-static struct ctl_table nss_connmgr_l2tpv2_dir[] = {
+-	{
+-		.procname		= "l2tpv2",
+-		.mode			= 0555,
+-		.child			= nss_connmgr_l2tpv2_table,
+-	},
+-	{ }
+-};
+-
+-/*
+- * nss_connmgr_l2tpv2_sysroot sysctl root dir
+- */
+-static struct ctl_table nss_connmgr_l2tpv2_sysroot[] = {
+-	{
+-		.procname		= "nss",
+-		.mode			= 0555,
+-		.child			= nss_connmgr_l2tpv2_dir,
+-	},
+-	{ }
+-};
+ #endif
+ 
+ /*
+@@ -1029,7 +1006,7 @@ int __init nss_connmgr_l2tpv2_init_modul
+ 	}
+ #endif
+ #if defined(NSS_L2TP_IPSEC_BIND_BY_NETDEV)
+-	ctl_tbl_hdr = register_sysctl_table(nss_connmgr_l2tpv2_sysroot);
++	ctl_tbl_hdr = register_sysctl("nss/l2tpv2", nss_connmgr_l2tpv2_table);
+ 	if (!ctl_tbl_hdr) {
+ 		nss_connmgr_l2tpv2_info("Unable to register sysctl table for L2TP conn mgr\n");
+ 		return -EFAULT;
+--- a/netlink/nss_nlipsec.c
++++ b/netlink/nss_nlipsec.c
+@@ -394,7 +394,7 @@ static int nss_nlipsec_op_create_tunnel(
+ 	 * the tunnel I/F name into the same rule and send it
+ 	 * as part of the response for the create operation
+ 	 */
+-	strlcpy(nl_rule->ifname, dev->name, IFNAMSIZ);
++	strscpy(nl_rule->ifname, dev->name, IFNAMSIZ);
+ 
+ 	/*
+ 	 * Send to userspace
+--- a/netlink/nss_nldtls.c
++++ b/netlink/nss_nldtls.c
+@@ -1109,7 +1109,7 @@ static ssize_t nss_nldtls_tunnel_stats_r
+ 	list_for_each_entry(entry, &gbl_ctx.dtls_list_head, list) {
+ 		spin_lock_bh(&gbl_ctx.lock);
+ 		memcpy(&stats, &entry->stats, sizeof(stats));
+-		strlcpy(dev_name, entry->dev_name, IFNAMSIZ);
++		strscpy(dev_name, entry->dev_name, IFNAMSIZ);
+ 		spin_unlock_bh(&gbl_ctx.lock);
+ 
+ 		size_wr += scnprintf(lbuf + size_wr, size_al - size_wr, "\n--------------------------------");
+--- a/clmapmgr/nss_clmapmgr.c
++++ b/clmapmgr/nss_clmapmgr.c
+@@ -185,7 +185,7 @@ static void nss_clmapmgr_setup(struct ne
+ {
+ 	char name[IFNAMSIZ] = {0};
+ 
+-	strlcpy(name, "nssclmap%d", IFNAMSIZ);
++	strscpy(name, "nssclmap%d", IFNAMSIZ);
+ 	memcpy(dev->name, name, IFNAMSIZ);
+ 	dev->netdev_ops = &nss_clmapmgr_ops;
+ 	eth_hw_addr_random(dev);
+--- a/portifmgr/nss_portifmgr.c
++++ b/portifmgr/nss_portifmgr.c
+@@ -271,8 +271,7 @@ struct net_device *nss_portifmgr_create_
+ 	/*
+ 	 * Setup temp mac address, this can be changed with ifconfig later
+ 	 */
+-	memcpy(ndev->dev_addr, "\x00\x03\x7f\x11\x22\x00", ETH_ALEN);
+-	ndev->dev_addr[5] = 0x10 + port_id;
++	eth_hw_addr_set(ndev, (const u8 []){0x00, 0x03, 0x7f, 0x11, 0x22, 0x10 + port_id});
+ 
+ 	err = register_netdev(ndev);
+ 	if (err) {
+--- a/ipsecmgr/v2.0/nss_ipsecmgr_tunnel.c
++++ b/ipsecmgr/v2.0/nss_ipsecmgr_tunnel.c
+@@ -445,7 +445,7 @@ static void nss_ipsecmgr_tunnel_setup(st
+ 	/*
+ 	 * Get the MAC address from the ethernet device
+ 	 */
+-	random_ether_addr(dev->dev_addr);
++	eth_hw_addr_random(dev);
+ 
+ 	memset(dev->broadcast, 0xff, dev->addr_len);
+ 	memcpy(dev->perm_addr, dev->dev_addr, dev->addr_len);
+--- a/tls/nss_tlsmgr_tun.c
++++ b/tls/nss_tlsmgr_tun.c
+@@ -180,7 +180,7 @@ static void nss_tlsmgr_tun_setup(struct
+ 	/*
+ 	 * Get the MAC address from the ethernet device
+ 	 */
+-	random_ether_addr(dev->dev_addr);
++	eth_hw_addr_random(dev);
+ 
+ 	memset(dev->broadcast, 0xff, dev->addr_len);
+ 	memcpy(dev->perm_addr, dev->dev_addr, dev->addr_len);
+@@ -226,7 +226,7 @@ static void nss_tlsmgr_notify_event(stru
+ #if (LINUX_VERSION_CODE < KERNEL_VERSION(4, 15, 0))
+ 	struct nss_tlsmgr_tun *tun = (struct nss_tlsmgr_tun *)data;
+ #else
+-	struct nss_tlsmgr_tun *tun = from_timer(tun, tm, notify.timer);
++	struct nss_tlsmgr_tun *tun = timer_container_of(tun, tm, notify.timer);
+ #endif
+ 	nss_tlsmgr_notify_callback_t cb;
+ 	struct nss_tlsmgr_stats stats;
+@@ -258,7 +258,7 @@ static void nss_tlsmgr_notify_decongesti
+ #if (LINUX_VERSION_CODE < KERNEL_VERSION(4, 15, 0))
+ 	struct nss_tlsmgr_tun *tun = (struct nss_tlsmgr_tun *)data;
+ #else
+-	struct nss_tlsmgr_tun *tun = from_timer(tun, tm, notify.timer);
++	struct nss_tlsmgr_tun *tun = timer_container_of(tun, tm, decongest.timer);
+ #endif
+ 	nss_tlsmgr_decongest_callback_t cb;
+ 	void *app_data;
+@@ -326,7 +326,7 @@ void nss_tlsmgr_unregister_notify(struct
+ 	write_unlock_bh(&tun->lock);
+ 
+ 	BUG_ON(in_atomic());
+-	del_timer_sync(&tun->notify.timer);
++	timer_delete_sync(&tun->notify.timer);
+ }
+ 
+ /*
+@@ -453,7 +453,7 @@ void nss_tlsmgr_tun_del(struct net_devic
+ 
+ 	nss_tlsmgr_unregister_notify(dev);
+ 
+-	del_timer_sync(&tun->decongest.timer);
++	timer_delete_sync(&tun->decongest.timer);
+ 	tun->decongest.app_data = NULL;
+ 	tun->decongest.cb = NULL;
+ 	tun->decongest.ticks = 0;
+--- a/pvxlanmgr/nss_pvxlanmgr.c
++++ b/pvxlanmgr/nss_pvxlanmgr.c
+@@ -305,7 +305,7 @@ static void nss_pvxlanmgr_dummy_netdev_s
+ 	dev->priv_destructor = NULL;
+ #endif
+ 
+-	memcpy(dev->dev_addr, "\x00\x00\x00\x00\x00\x00", dev->addr_len);
++	eth_hw_addr_set(dev, (const u8 *)"\x00\x00\x00\x00\x00\x00");
+ 	memset(dev->broadcast, 0xff, dev->addr_len);
+ 	memcpy(dev->perm_addr, dev->dev_addr, dev->addr_len);
+ }
+--- a/dtls/v1.0/nss_connmgr_dtls_netdev.c
++++ b/dtls/v1.0/nss_connmgr_dtls_netdev.c
+@@ -160,9 +160,9 @@ static void nss_dtlsmgr_dev_setup(struct
+ 	dev->ethtool_ops = NULL;
+ 	dev->header_ops = NULL;
+ 	dev->netdev_ops = &nss_dtlsmgr_session_ops;
+-	dev->destructor = NULL;
++	dev->priv_destructor = NULL;
+ 
+-	memcpy(dev->dev_addr, "\xaa\xbb\xcc\xdd\xee\xff", dev->addr_len);
++	eth_hw_addr_set(dev, (const u8 *)"\xaa\xbb\xcc\xdd\xee\xff");
+ 	memset(dev->broadcast, 0xff, dev->addr_len);
+ 	memcpy(dev->perm_addr, dev->dev_addr, dev->addr_len);
+ }
+--- a/dtls/v2.0/nss_dtlsmgr_ctx_dev.c
++++ b/dtls/v2.0/nss_dtlsmgr_ctx_dev.c
+@@ -526,7 +526,7 @@ void nss_dtlsmgr_ctx_dev_setup(struct ne
+ #else
+ 	dev->priv_destructor = nss_dtlsmgr_ctx_dev_free;
+ #endif
+-	memcpy(dev->dev_addr, "\xaa\xbb\xcc\xdd\xee\xff", dev->addr_len);
++	eth_hw_addr_set(dev, (const u8 *)"\xaa\xbb\xcc\xdd\xee\xff");
+ 	memset(dev->broadcast, 0xff, dev->addr_len);
+ 	memcpy(dev->perm_addr, dev->dev_addr, dev->addr_len);
+ }
+--- a/capwapmgr/nss_capwapmgr.c
++++ b/capwapmgr/nss_capwapmgr.c
+@@ -403,7 +403,7 @@ static void nss_capwapmgr_dummpy_netdev_
+ #else
+ 	dev->priv_destructor = NULL;
+ #endif
+-	memcpy(dev->dev_addr, "\x00\x00\x00\x00\x00\x00", dev->addr_len);
++	eth_hw_addr_set(dev, (const u8 *)"\x00\x00\x00\x00\x00\x00");
+ 	memset(dev->broadcast, 0xff, dev->addr_len);
+ 	memcpy(dev->perm_addr, dev->dev_addr, dev->addr_len);
+ }

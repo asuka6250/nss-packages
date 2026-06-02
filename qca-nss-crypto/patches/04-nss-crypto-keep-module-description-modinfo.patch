@@ -1,0 +1,15 @@
+--- a/v2.0/src/nss_crypto_ctrl.c
++++ b/v2.0/src/nss_crypto_ctrl.c
+@@ -1796,3 +1796,4 @@ module_exit(nss_crypto_module_exit);
+ 
+ MODULE_LICENSE("Dual BSD/GPL");
+ MODULE_DESCRIPTION("QCA NSS Crypto driver");
++MODULE_INFO(description, "QCA NSS Crypto driver");
+--- a/v2.0/tool/nss_crypto_bench.c
++++ b/v2.0/tool/nss_crypto_bench.c
+@@ -1003,4 +1003,5 @@ module_exit(crypto_bench_exit);
+ 
+ MODULE_LICENSE("Dual BSD/GPL");
+ MODULE_DESCRIPTION("QCA NSS Crypto driver");
++MODULE_INFO(description, "QCA NSS Crypto driver");
+ MODULE_AUTHOR("Qualcomm Atheros Inc");

@@ -1,0 +1,122 @@
+--- a/dtls/v2.0/nss_dtlsmgr_ctx.c
++++ b/dtls/v2.0/nss_dtlsmgr_ctx.c
+@@ -19,6 +19,7 @@
+  *	NSS DTLS Manager Context
+  */
+ 
++#include <linux/vmalloc.h>
+ #include <linux/version.h>
+ #include <linux/types.h>
+ #include <linux/ip.h>
+--- a/mirror/nss_mirror.c
++++ b/mirror/nss_mirror.c
+@@ -17,6 +17,7 @@
+  */
+ 
+ #include <linux/version.h>
++#include <linux/vmalloc.h>
+ #include <linux/types.h>
+ #include <linux/module.h>
+ #include <linux/netdevice.h>
+--- a/netlink/nss_nldtls.c
++++ b/netlink/nss_nldtls.c
+@@ -18,6 +18,7 @@
+  */
+ 
+ #include <crypto/internal/skcipher.h>
++#include <linux/vmalloc.h>
+ #include <linux/debugfs.h>
+ #include <linux/etherdevice.h>
+ #include <linux/icmp.h>
+--- a/nss_qdisc/nss_qdisc.h
++++ b/nss_qdisc/nss_qdisc.h
+@@ -14,6 +14,7 @@
+  **************************************************************************
+  */
+ 
++#include <linux/timer.h>
+ #include <linux/module.h>
+ #include <linux/of.h>
+ #include <linux/types.h>
+--- a/nss_qdisc/nss_qdisc_stats.c
++++ b/nss_qdisc/nss_qdisc_stats.c
+@@ -17,6 +17,7 @@
+  **************************************************************************
+  */
+ 
++#include <linux/timer.h>
+ #include "nss_qdisc.h"
+ 
+ static LIST_HEAD(nss_qdisc_stats_list);			/* List of stats request nodes */
+--- a/openvpn/src/nss_ovpnmgr_crypto.c
++++ b/openvpn/src/nss_ovpnmgr_crypto.c
+@@ -18,6 +18,7 @@
+  * nss_ovpnmgr_crypto.c
+  */
+ #include <linux/version.h>
++#include <linux/vmalloc.h>
+ #include <linux/types.h>
+ #include <linux/module.h>
+ #include <linux/if.h>
+--- a/tls/nss_tlsmgr.c
++++ b/tls/nss_tlsmgr.c
+@@ -22,6 +22,7 @@
+  */
+ 
+ #include <linux/version.h>
++#include <linux/vmalloc.h>
+ #include <linux/types.h>
+ #include <linux/module.h>
+ #include <linux/if_arp.h>
+--- a/tls/nss_tlsmgr_crypto.c
++++ b/tls/nss_tlsmgr_crypto.c
+@@ -22,6 +22,7 @@
+  */
+ 
+ #include <linux/version.h>
++#include <linux/vmalloc.h>
+ #include <linux/types.h>
+ #include <linux/ip.h>
+ #include <linux/tcp.h>
+--- a/tls/nss_tlsmgr_ctx.c
++++ b/tls/nss_tlsmgr_ctx.c
+@@ -22,6 +22,8 @@
+  */
+ 
+ #include <linux/version.h>
++#include <linux/timer.h>
++#include <linux/vmalloc.h>
+ #include <linux/types.h>
+ #include <linux/ip.h>
+ #include <linux/tcp.h>
+--- a/tls/nss_tlsmgr_tun.c
++++ b/tls/nss_tlsmgr_tun.c
+@@ -22,6 +22,7 @@
+  */
+ 
+ #include <linux/version.h>
++#include <linux/timer.h>
+ #include <linux/types.h>
+ #include <linux/ip.h>
+ #include <linux/tcp.h>
+--- a/tls/nss_tlsmgr_tun.h
++++ b/tls/nss_tlsmgr_tun.h
+@@ -23,6 +23,8 @@
+ #ifndef __NSS_TLSMGR_TUN_H_
+ #define __NSS_TLSMGR_TUN_H_
+ 
++#include <linux/timer.h>
++
+ #define NSS_TLSMGR_MAX_HDR_SZ \
+ 	(sizeof(struct ipv6hdr) + sizeof(struct tcphdr) + sizeof(struct tlshdr) + AES_BLOCK_SIZE)
+ #define NSS_TLSMGR_MAX_TRAILER_SZ (AES_BLOCK_SIZE + SHA256_DIGEST_SIZE + 1)
+--- a/tunipip6/nss_connmgr_tunipip6.c
++++ b/tunipip6/nss_connmgr_tunipip6.c
+@@ -16,6 +16,7 @@
+  **************************************************************************
+  */
+ 
++#include <linux/vmalloc.h>
+ #include <linux/version.h>
+ #include <linux/types.h>
+ #include <linux/ip.h>

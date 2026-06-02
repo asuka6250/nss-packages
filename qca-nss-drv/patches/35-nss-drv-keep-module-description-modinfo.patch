@@ -1,0 +1,9 @@
+--- a/nss_init.c
++++ b/nss_init.c
+@@ -1034,5 +1034,6 @@ module_init(nss_init);
+ module_exit(nss_cleanup);
+ 
+ MODULE_DESCRIPTION("QCA NSS Driver");
++MODULE_INFO(description, "QCA NSS Driver");
+ MODULE_AUTHOR("Qualcomm Atheros Inc");
+ MODULE_LICENSE("Dual BSD/GPL");

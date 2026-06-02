@@ -1,0 +1,88 @@
+--- a/nss_crypto_cmn_stats.c
++++ b/nss_crypto_cmn_stats.c
+@@ -17,6 +17,8 @@
+  **************************************************************************
+  */
+ 
++#include <linux/vmalloc.h>
++
+ #include "nss_core.h"
+ #include "nss_crypto_cmn_stats.h"
+ #include "nss_crypto_cmn_strings.h"
+--- a/nss_dma_stats.c
++++ b/nss_dma_stats.c
+@@ -17,6 +17,8 @@
+  **************************************************************************
+  */
+ 
++#include <linux/vmalloc.h>
++
+ #include "nss_core.h"
+ #include "nss_dma.h"
+ #include "nss_dma_stats.h"
+--- a/nss_dtls_cmn_stats.c
++++ b/nss_dtls_cmn_stats.c
+@@ -17,6 +17,8 @@
+  ***************************************************************************
+  */
+ 
++#include <linux/vmalloc.h>
++
+ #include "nss_core.h"
+ #include "nss_dtls_cmn.h"
+ #include "nss_dtls_cmn_stats.h"
+--- a/nss_ipsec_cmn_stats.c
++++ b/nss_ipsec_cmn_stats.c
+@@ -17,6 +17,8 @@
+  ***************************************************************************
+  */
+ 
++#include <linux/vmalloc.h>
++
+ #include "nss_core.h"
+ #include "nss_ipsec_cmn.h"
+ #include "nss_ipsec_cmn_stats.h"
+--- a/nss_mirror_stats.c
++++ b/nss_mirror_stats.c
+@@ -17,6 +17,8 @@
+  **************************************************************************
+  */
+ 
++#include <linux/vmalloc.h>
++
+ #include "nss_stats.h"
+ #include "nss_core.h"
+ #include "nss_mirror.h"
+--- a/nss_ppe_vp.c
++++ b/nss_ppe_vp.c
+@@ -20,6 +20,8 @@
+  * Header file for qca-ssdk APIs
+  */
+ #include <ref/ref_vsi.h>
++#include <linux/vmalloc.h>
++
+ 
+ #include "nss_ppe_vp.h"
+ #include "nss_ppe_vp_stats.h"
+--- a/nss_qvpn_stats.c
++++ b/nss_qvpn_stats.c
+@@ -17,6 +17,8 @@
+  **************************************************************************
+  */
+ 
++#include <linux/vmalloc.h>
++
+ #include "nss_core.h"
+ #include <nss_qvpn.h>
+ #include "nss_qvpn_stats.h"
+--- a/nss_tls_stats.c
++++ b/nss_tls_stats.c
+@@ -17,6 +17,8 @@
+  ******************************************************************************
+  */
+ 
++#include <linux/vmalloc.h>
++
+ #include "nss_core.h"
+ #include "nss_tls.h"
+ #include "nss_tls_stats.h"
