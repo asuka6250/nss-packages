@@ -283,3 +283,12 @@
  	/*Make the mc ready before publishing it*/
  	if (mc_open(mc) < 0) {
  		kfree(mc);
+--- a/mc_main.c
++++ b/mc_main.c
+@@ -77,5 +77,6 @@ static void __exit mc_exit(void)
+ 
+ module_init(mc_init);
+ module_exit(mc_exit);
++MODULE_INFO(description, "QCA multicast snooping");
+ MODULE_LICENSE("GPL v2");
+ 

@@ -1,9 +1,0 @@
---- a/ecm_init.c
-+++ b/ecm_init.c
-@@ -455,5 +455,6 @@ module_init(ecm_init)
- module_exit(ecm_exit)
- 
- MODULE_DESCRIPTION("ECM Core");
-+MODULE_INFO(description, "ECM Core");
- MODULE_LICENSE("Dual BSD/GPL");
- 

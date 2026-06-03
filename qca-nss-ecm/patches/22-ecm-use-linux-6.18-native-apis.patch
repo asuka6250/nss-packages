@@ -1,3 +1,12 @@
+--- a/ecm_init.c
++++ b/ecm_init.c
+@@ -455,5 +455,6 @@ module_init(ecm_init)
+ module_exit(ecm_exit)
+ 
+ MODULE_DESCRIPTION("ECM Core");
++MODULE_INFO(description, "ECM Core");
+ MODULE_LICENSE("Dual BSD/GPL");
+ 
 --- a/ecm_tracker.c
 +++ b/ecm_tracker.c
 @@ -32,7 +32,7 @@
@@ -209,7 +218,15 @@
  #include <net/ip6_route.h>
 --- a/ecm_db/ecm_db_timer.c
 +++ b/ecm_db/ecm_db_timer.c
-@@ -30,7 +30,7 @@
+@@ -18,6 +18,7 @@
+ #include <linux/types.h>
+ #include <linux/ip.h>
+ #include <linux/tcp.h>
++#include <linux/timer.h>
+ #include <linux/module.h>
+ #include <linux/skbuff.h>
+ #include <linux/icmp.h>
+@@ -29,7 +30,7 @@
  #include <net/route.h>
  #include <net/ip.h>
  #include <net/tcp.h>
@@ -218,6 +235,13 @@
  #include <asm/uaccess.h>	/* for put_user */
  #include <net/ipv6.h>
  #include <net/ip6_route.h>
+@@ -521,5 +522,5 @@ void ecm_db_timer_exit(void)
+ 	 * as we would wait for the callback to finish and it would wait
+ 	 * indefinately for the lock to be released!
+ 	 */
+-	del_timer_sync(&ecm_db_timer);
++	timer_delete_sync(&ecm_db_timer);
+ }
 --- a/ecm_db/ecm_db_host.c
 +++ b/ecm_db/ecm_db_host.c
 @@ -30,7 +30,7 @@
