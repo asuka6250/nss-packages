@@ -101,17 +101,20 @@ else ifeq ($(CONFIG_TARGET_SUBTARGET), "ipq50xx")
 endif
 
 define Build/InstallDev
-	mkdir -p $(1)/usr/include/qca-nss-drv
+	$(INSTALL_DIR) $(1)/usr/include/qca-nss-drv
 	$(CP) $(PKG_BUILD_DIR)/exports/* $(1)/usr/include/qca-nss-drv/
 ifneq (, $(findstring $(subtarget), "ipq807x" "ipq807x_64" "ipq60xx" "ipq60xx_64" "ipq50xx" "ipq50xx_64"))
 	$(RM) $(1)/usr/include/qca-nss-drv/nss_ipsecmgr.h
 endif
 endef
 
-EXTRA_CFLAGS+= -I$(STAGING_DIR)/usr/include/qca-nss-dp \
-			   -I$(STAGING_DIR)/usr/include/qca-ssdk \
-			   -Wno-missing-declarations -Wno-missing-prototypes \
-			   -Wno-empty-body -Wno-unused-variable
+EXTRA_CFLAGS+= \
+	-I$(STAGING_DIR)/usr/include/qca-nss-dp \
+	-I$(STAGING_DIR)/usr/include/qca-ssdk \
+	-Wno-missing-declarations \
+	-Wno-missing-prototypes \
+	-Wno-empty-body \
+	-Wno-unused-variable
 
 ifdef CONFIG_NSS_MEM_PROFILE_MEDIUM
   EXTRA_CFLAGS += -DNSS_MEM_PROFILE_MEDIUM
@@ -125,8 +128,17 @@ endif
 
 DRV_MAKE_OPTS:=
 
-# Features without usable qualcommax/6.18 client packages are always disabled.
-DRV_MAKE_OPTS +=    NSS_DRV_CAPWAP_ENABLE=n    NSS_DRV_C2C_ENABLE=n    NSS_DRV_CLMAP_ENABLE=n    NSS_DRV_DTLS_ENABLE=n    NSS_DRV_IPSEC_ENABLE=n    NSS_DRV_PVXLAN_ENABLE=n    NSS_DRV_QVPN_ENABLE=n    NSS_DRV_TLS_ENABLE=n    NSS_DRV_WIFI_LEGACY_ENABLE=n
+# Features without usable qualcommax/6.18 client packages are disabled.
+DRV_MAKE_OPTS+= \
+	NSS_DRV_CAPWAP_ENABLE=n \
+	NSS_DRV_C2C_ENABLE=n \
+	NSS_DRV_CLMAP_ENABLE=n \
+	NSS_DRV_DTLS_ENABLE=n \
+	NSS_DRV_IPSEC_ENABLE=n \
+	NSS_DRV_PVXLAN_ENABLE=n \
+	NSS_DRV_QVPN_ENABLE=n \
+	NSS_DRV_TLS_ENABLE=n \
+	NSS_DRV_WIFI_LEGACY_ENABLE=n
 
 ifndef CONFIG_NSS_DRV_BRIDGE_ENABLE
    DRV_MAKE_OPTS += NSS_DRV_BRIDGE_ENABLE=n
