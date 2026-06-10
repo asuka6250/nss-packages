@@ -192,7 +192,7 @@ define KernelPackage/qca-nss-drv-bridge-mgr
 	   +kmod-qca-nss-drv-vlan-mgr \
 	   +kmod-bonding
 ifneq ($(CONFIG_PACKAGE_kmod-qca-ovsmgr),)
-  DEPENDS+=kmod-qca-ovsmgr
+  DEPENDS+=+kmod-qca-ovsmgr
 endif
   FILES:=$(PKG_BUILD_DIR)/bridge/qca-nss-bridge-mgr.ko
   AUTOLOAD:=$(call AutoLoad,51,qca-nss-bridge-mgr)
@@ -227,7 +227,6 @@ define KernelPackage/qca-nss-drv-qdisc
   DEPENDS:=@TARGET_qualcommax \
 	   +kmod-qca-nss-drv \
 	   +@NSS_DRV_SHAPER_ENABLE \
-	   +@NSS_DRV_IGS_ENABLE \
 	   +!TARGET_qualcommax_ipq50xx:kmod-qca-nss-drv-bridge-mgr
   FILES:=$(PKG_BUILD_DIR)/nss_qdisc/qca-nss-qdisc.ko
   KCONFIG:=CONFIG_NET_CLS_ACT=y

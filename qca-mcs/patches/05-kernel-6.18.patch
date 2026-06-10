@@ -126,7 +126,7 @@
 -#else
 -	struct mc_mdb_entry *mdb = (struct mc_mdb_entry *)data;
 -#endif
-+	struct mc_mdb_entry *mdb = container_of(tl, typeof(*mdb), etimer);
++	struct mc_mdb_entry *mdb = timer_container_of(mdb, tl, etimer);
  	struct mc_struct *mc = mdb->mc;
  	struct mc_port_group *pg;
  	struct hlist_node *pgh;
@@ -200,7 +200,7 @@
 -#else
 -	struct mc_struct *mc = (struct mc_struct *)data;
 -#endif
-+	struct mc_struct *mc = container_of(tl, typeof(*mc), rtimer);
++	struct mc_struct *mc = timer_container_of(mc, tl, rtimer);
  	unsigned long next_timer = jiffies + mc->querier_interval;
  	struct hlist_node *h;
  	struct mc_querier_entry *qe;
@@ -220,7 +220,7 @@
 -#else
 -	struct mc_struct *mc = (struct mc_struct *)data;
 -#endif
-+	struct mc_struct *mc = container_of(tl, typeof(*mc), qtimer);
++	struct mc_struct *mc = timer_container_of(mc, tl, qtimer);
  	unsigned long next_timer = jiffies + mc->local_query_interval;
  
  	if (mc->timeout_gmi_enable)
@@ -240,7 +240,7 @@
 -#else
 -	struct mc_struct *mc = (struct mc_struct *)data;
 -#endif
-+	struct mc_struct *mc = container_of(tl, typeof(*mc), agingtimer);
++	struct mc_struct *mc = timer_container_of(mc, tl, agingtimer);
  	struct mc_querier_entry *igmp_root_qe = mc->rp.igmp_root_qe;
  	unsigned long next_timer, now = jiffies;
  	unsigned long igmp_expire_time = mc->membership_interval;
@@ -256,7 +256,7 @@
  {
 -#if (LINUX_VERSION_CODE >= KERNEL_VERSION(5, 4, 0))
 -	struct mc_struct *mc = from_timer(mc, tl, evtimer);
-+	struct mc_struct *mc = container_of(tl, typeof(*mc), evtimer);
++	struct mc_struct *mc = timer_container_of(mc, tl, evtimer);
  
  	mc_netlink_event_send(mc, MC_EVENT_MDB_UPDATED,	0, NULL);
 -#else

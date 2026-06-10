@@ -28,10 +28,10 @@ define KernelPackage/qca-nss-ecm
   DEPENDS:=@TARGET_qualcommax \
 		+ethtool \
 		+kmod-nf-conntrack \
+		+kmod-qca-nss-drv \
 		+@NSS_DRV_IPV6_ENABLE \
 		+@NSS_DRV_VIRT_IF_ENABLE \
 		+@(PACKAGE_kmod-pppoe):NSS_DRV_PPPOE_ENABLE \
-		+PACKAGE_kmod-qca-nss-drv:kmod-qca-nss-drv \
 		+PACKAGE_kmod-qca-mcs:kmod-qca-mcs \
 		+PACKAGE_kmod-bonding:kmod-bonding \
 		+PACKAGE_kmod-vxlan:kmod-vxlan \

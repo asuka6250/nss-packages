@@ -47,15 +47,6 @@
  			return ret;
 --- a/nss_qdisc/nss_bf.c
 +++ b/nss_qdisc/nss_bf.c
-@@ -74,7 +74,7 @@ static inline struct nss_bf_class_data *
-  */
- #if (LINUX_VERSION_CODE < KERNEL_VERSION(4, 16, 0))
- static int nss_bf_change_class(struct Qdisc *sch, u32 classid, u32 parentid,
--		  struct nlattr **tca, unsigned long *arg)
-+		  struct nlattr **tca, unsigned long *arg, struct netlink_ext_ack *extack)
- {
- 	struct netlink_ext_ack *extack = NULL;
- #else
 @@ -290,7 +290,7 @@ static void nss_bf_destroy_class(struct
   * nss_bf_delete_class()
   *	Detaches a class from operation, but does not destroy it.
@@ -67,15 +58,6 @@
  	struct nss_bf_class_data *cl = (struct nss_bf_class_data *)arg;
 --- a/nss_qdisc/nss_htb.c
 +++ b/nss_qdisc/nss_htb.c
-@@ -282,7 +282,7 @@ static int nss_htb_ppe_change_class(stru
-  */
- #if (LINUX_VERSION_CODE < KERNEL_VERSION(4, 16, 0))
- static int nss_htb_change_class(struct Qdisc *sch, u32 classid, u32 parentid,
--		  struct nlattr **tca, unsigned long *arg)
-+		  struct nlattr **tca, unsigned long *arg, struct netlink_ext_ack *extack)
- {
- 	struct netlink_ext_ack *extack = NULL;
- #else
 @@ -516,7 +516,7 @@ static void nss_htb_destroy_class(struct
   * nss_htb_delete_class()
   *	Detaches a class from operation, but does not destroy it.
@@ -121,15 +103,6 @@
  	}
 --- a/nss_qdisc/nss_wrr.c
 +++ b/nss_qdisc/nss_wrr.c
-@@ -229,7 +229,7 @@ static int nss_wrr_ppe_change_class(stru
- 
- #if (LINUX_VERSION_CODE < KERNEL_VERSION(4, 16, 0))
- static int nss_wrr_change_class(struct Qdisc *sch, u32 classid, u32 parentid,
--		  struct nlattr **tca, unsigned long *arg)
-+		  struct nlattr **tca, unsigned long *arg, struct netlink_ext_ack *extack)
- {
- 	struct netlink_ext_ack *extack = NULL;
- #else
 @@ -400,7 +400,7 @@ failure:
  	return -EINVAL;
  }
