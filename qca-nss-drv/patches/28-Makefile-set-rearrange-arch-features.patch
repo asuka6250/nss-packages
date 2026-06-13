@@ -73,3 +73,23 @@
  
  ifneq "$(NSS_DRV_VLAN_ENABLE)" "n"
  ccflags-y += -DNSS_DRV_VLAN_ENABLE
+@@ -600,6 +604,19 @@ ccflags-y += -I$(obj)/nss_data_plane/hal
+ ccflags-y += -DNSS_PM_DEBUG_LEVEL=0 -DNSS_SKB_REUSE_SUPPORT=1
+ ccflags-y += -Wall -Werror
+ 
++# These feature blocks are not part of the maintained qualcommax/OpenWrt NSS
++# package set. Keep them hard-disabled until matching client/user packages and
++# 6.18 compatibility fixes are added deliberately.
++override NSS_DRV_CAPWAP_ENABLE := n
++override NSS_DRV_C2C_ENABLE := n
++override NSS_DRV_CLMAP_ENABLE := n
++override NSS_DRV_DTLS_ENABLE := n
++override NSS_DRV_IPSEC_ENABLE := n
++override NSS_DRV_PVXLAN_ENABLE := n
++override NSS_DRV_QVPN_ENABLE := n
++override NSS_DRV_TLS_ENABLE := n
++override NSS_DRV_WIFI_LEGACY_ENABLE := n
++
+ KERNELVERSION := $(word 1, $(subst ., ,$(KERNELVERSION))).$(word 2, $(subst ., ,$(KERNELVERSION)))
+ 
+ ifneq ($(findstring 3.4, $(KERNELVERSION)),)

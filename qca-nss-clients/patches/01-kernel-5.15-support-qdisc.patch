@@ -1,42 +1,20 @@
 --- a/nss_qdisc/igs/nss_mirred.c
 +++ b/nss_qdisc/igs/nss_mirred.c
-@@ -82,20 +82,13 @@ static const struct nla_policy nss_mirre
-  * nss_mirred_init()
-  *	Initialize the nss mirred action.
-  */
--#if (LINUX_VERSION_CODE < KERNEL_VERSION(5, 4, 0))
+@@ -89,10 +89,10 @@ static int nss_mirred_init(struct net *n
+ {
+ #else
  static int nss_mirred_init(struct net *net, struct nlattr *nla,
--			   struct nlattr *est, struct tc_action *tc_act, int ovr,
--			   int bind)
--{
--#else
--static int nss_mirred_init(struct net *net, struct nlattr *nla,
 -			   struct nlattr *est, struct tc_action **tc_act, int ovr,
 -			   int bind, bool rtnl_held, struct tcf_proto *tp,
 -			   struct netlink_ext_ack *extack)
-+						struct nlattr *est, struct tc_action **tc_act,
-+						struct tcf_proto *tp, u32 flags, struct netlink_ext_ack *extack)
++			   struct nlattr *est, struct tc_action **tc_act,
++			   struct tcf_proto *tp, u32 flags, struct netlink_ext_ack *extack)
  {
 +	bool bind = flags & TCA_ACT_FLAGS_BIND;
  	struct tc_action_net *tn = net_generic(net, nss_mirred_net_id);
  	u32 index;
--#endif
- 	struct nlattr *arr[TC_NSS_MIRRED_MAX + 1];
- 	struct tc_nss_mirred *parm;
- 	struct nss_mirred_tcf *act;
-@@ -110,11 +103,7 @@ static int nss_mirred_init(struct net *n
- 	/*
- 	 * Parse and validate the user configurations.
- 	 */
--#if (LINUX_VERSION_CODE < KERNEL_VERSION(5, 2, 0))
--	ret = nla_parse_nested(arr, TC_NSS_MIRRED_MAX, nla, nss_mirred_policy);
--#else
- 	ret = nla_parse_nested_deprecated(arr, TC_NSS_MIRRED_MAX, nla, nss_mirred_policy, extack);
--#endif
- 	if (ret < 0) {
- 		return ret;
- 	}
-@@ -240,7 +229,7 @@ static int nss_mirred_init(struct net *n
+ #endif
+@@ -240,7 +240,7 @@ static int nss_mirred_init(struct net *n
  
  	if (!ret) {
  		ret = tcf_idr_create(tn, index, est, tc_act, &nss_mirred_act_ops,
@@ -88,19 +66,15 @@
  		spin_unlock_bh(&nq->bounce_protection_lock);
  	}
  
-@@ -1209,11 +1210,7 @@ static bool nss_qdisc_iterate_fl(struct
- 		return 0;
- 	}
- 
--#if (LINUX_VERSION_CODE < KERNEL_VERSION(5, 4, 0))
--	status = tc_classify(skb, tcf, &res, false);
--#else
+@@ -1212,7 +1213,7 @@ static bool nss_qdisc_iterate_fl(struct
+ #if (LINUX_VERSION_CODE < KERNEL_VERSION(5, 4, 0))
+ 	status = tc_classify(skb, tcf, &res, false);
+ #else
 -	status = tcf_classify(skb, tcf, &res, false);
--#endif
 +	status = tcf_classify(skb, NULL, tcf, &res, false);
+ #endif
  	if ((status == TC_ACT_STOLEN) || (status == TC_ACT_QUEUED)) {
  		return 1;
- 	}
 --- a/nss_qdisc/nss_wrr.c
 +++ b/nss_qdisc/nss_wrr.c
 @@ -400,7 +400,7 @@ failure:

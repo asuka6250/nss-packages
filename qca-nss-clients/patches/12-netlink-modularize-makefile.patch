@@ -29,12 +29,12 @@
 -ccflags-y += -DCONFIG_NSS_NLL2TPV2=1
 -ccflags-y += -DCONFIG_NSS_NLQRFS=1
 -ccflags-y += -DCONFIG_NSS_NLPPTP=1
-+ccflags-y += -DCONFIG_NSS_NLLSO_RX=$(strip $(if $(filter $(lso), y), 1 , 0))
-+ccflags-y += -DCONFIG_NSS_NLMAP_T=$(strip $(if $(filter $(map-t), y), 1 , 0))
-+ccflags-y += -DCONFIG_NSS_NLPPPOE=$(strip $(if $(filter $(pppoe), y), 1 , 0))
-+ccflags-y += -DCONFIG_NSS_NLL2TPV2=$(strip $(if $(filter $(l2tp), y), 1 , 0))
++ccflags-y += -DCONFIG_NSS_NLLSO_RX=$(strip $(if $(filter $(CONFIG_NSS_NLLSO_RX), y), 1 , 0))
++ccflags-y += -DCONFIG_NSS_NLMAP_T=$(strip $(if $(filter $(CONFIG_NSS_NLMAP_T), y), 1 , 0))
++ccflags-y += -DCONFIG_NSS_NLPPPOE=$(strip $(if $(filter $(CONFIG_NSS_NLPPPOE), y), 1 , 0))
++ccflags-y += -DCONFIG_NSS_NLL2TPV2=$(strip $(if $(filter $(CONFIG_NSS_NLL2TPV2), y), 1 , 0))
 +ccflags-y += -DCONFIG_NSS_NLQRFS=$(strip $(if $(filter $(CONFIG_NSS_NLQRFS), y), 1 , 0))
-+ccflags-y += -DCONFIG_NSS_NLPPTP=$(strip $(if $(filter $(pptp), y), 1 , 0))
++ccflags-y += -DCONFIG_NSS_NLPPTP=$(strip $(if $(filter $(CONFIG_NSS_NLPPTP), y), 1 , 0))
  ccflags-y += -DCONFIG_NSS_NLCAPWAP=${CAPWAP_ENABLED}
 -ccflags-y += -DCONFIG_NSS_NLIPSEC=${IPSEC_ENABLED}
 -ccflags-y += -DCONFIG_NSS_NLDTLS=${DTLS_ENABLED}
@@ -44,7 +44,7 @@
 +ccflags-y += -DCONFIG_NSS_NLUDP_ST=$(strip $(if $(filter $(CONFIG_NSS_NLUDP_ST), y), 1 , 0))
  
  qca-nss-netlink-objs := nss_nl.o
-+ifneq (,$(filter $(gre), y))
++ifneq (,$(filter $(CONFIG_NSS_NLGRE_REDIR_FAMILY), y))
  qca-nss-netlink-objs += nss_nlgre_redir_family.o
  qca-nss-netlink-objs += nss_nlgre_redir_cmd.o
  qca-nss-netlink-objs += nss_nlgre_redir_cmn.o
@@ -66,19 +66,19 @@
  qca-nss-netlink-objs += nss_nlipv6_reasm.o
 +endif
  qca-nss-netlink-objs += nss_nlwifili.o
-+ifneq (,$(filter $(lso), y))
++ifneq (,$(filter $(CONFIG_NSS_NLLSO_RX), y))
  qca-nss-netlink-objs += nss_nllso_rx.o
 +endif
-+ifneq (,$(filter $(map-t), y))
++ifneq (,$(filter $(CONFIG_NSS_NLMAP_T), y))
  qca-nss-netlink-objs += nss_nlmap_t.o
 +endif
-+ifneq (,$(filter $(pppoe), y))
++ifneq (,$(filter $(CONFIG_NSS_NLPPPOE), y))
  qca-nss-netlink-objs += nss_nlpppoe.o
 +endif
-+ifneq (,$(filter $(l2tp), y))
++ifneq (,$(filter $(CONFIG_NSS_NLL2TPV2), y))
  qca-nss-netlink-objs += nss_nll2tpv2.o
 +endif
-+ifneq (,$(filter $(pptp), y))
++ifneq (,$(filter $(CONFIG_NSS_NLPPTP), y))
  qca-nss-netlink-objs += nss_nlpptp.o
 +endif
 +ifeq ($(SoC),$(filter $(SoC),ipq95xx ipq50xx ipq807x_64))
@@ -117,6 +117,23 @@
  endif
  
  ifeq ($(SoC),$(filter $(SoC),ipq60xx ipq60xx_64 ipq807x ipq807x_64))
+--- a/netlink/include/nss_nlipsec_if.h
++++ b/netlink/include/nss_nlipsec_if.h
+@@ -48,6 +48,7 @@ enum nss_nlipsec_cmd {
+ 	NSS_NLIPSEC_CMD_MAX
+ };
+ 
++#if (CONFIG_NSS_NLIPSEC == 1)
+ /**
+  * @brief IPsec SA message
+  */
+@@ -95,4 +96,6 @@ static inline void nss_nlipsec_rule_init
+ 	nss_nlcmn_init_cmd(&rule->cm, sizeof(struct nss_nlipsec_rule), type);
+ }
+ 
++#endif /* CONFIG_NSS_NLIPSEC */
++
+ #endif /* __NSS_NLIPSEC_IF_H */
 --- a/netlink/nss_nludp_st.h
 +++ b/netlink/nss_nludp_st.h
 @@ -23,10 +23,9 @@

@@ -20,12 +20,7 @@
  
  /* mc_br_port_get
   *	get bridge port by ifindex
-@@ -44,30 +45,17 @@ static struct net_bridge_port *mc_br_por
- 	return bp;
- }
- 
--#if (LINUX_VERSION_CODE >= KERNEL_VERSION(4, 3, 0))
--
+@@ -49,7 +50,7 @@ static struct net_bridge_port *mc_br_por
  /* mc_pre_routing_hook
   *	prerouting hook
   */
@@ -33,31 +28,8 @@
 +unsigned int mc_pre_routing_hook(void *priv,
  				    struct sk_buff *skb,
  				    const struct nf_hook_state *state)
--#elif (LINUX_VERSION_CODE >= KERNEL_VERSION(3, 13, 0))
--static unsigned int mc_pre_routing_hook(const struct nf_hook_ops *ops, struct sk_buff *skb,
--					const struct net_device *in, const struct net_device *out,
--					int(*okfn)(struct sk_buff *))
--#else
--static unsigned int mc_pre_routing_hook(unsigned int hooknum, struct sk_buff *skb,
--					const struct net_device *in, const struct net_device *out,
--					int(*okfn)(struct sk_buff *))
--#endif
- {
- 	struct mc_struct *mc;
- 	struct ethhdr *eh = eth_hdr(skb);
- 	struct net_bridge_port *port;
--#if (LINUX_VERSION_CODE >= KERNEL_VERSION(4, 3, 0))
- 	struct net_device *in = state->in;
--#endif
- 	u8 dscp;
- 
- 	rcu_read_lock();
-@@ -228,31 +216,18 @@ static bool mc_is_report_or_leave(struct
- 	return false;
- 
- }
--#if (LINUX_VERSION_CODE >= KERNEL_VERSION(4, 3, 0))
--
+ #elif (LINUX_VERSION_CODE >= KERNEL_VERSION(3, 13, 0))
+@@ -233,7 +234,7 @@ static bool mc_is_report_or_leave(struct
  /* mc_forward_hook
   *	forward hook to the linux kernel
   */
@@ -65,56 +37,33 @@
 +unsigned int mc_forward_hook(void *priv,
  				    struct sk_buff *skb,
  				    const struct nf_hook_state *state)
--#elif (LINUX_VERSION_CODE >= KERNEL_VERSION(3, 13, 0))
--static unsigned int mc_forward_hook(const struct nf_hook_ops *ops, struct sk_buff *skb,
--		const struct net_device *in, const struct net_device *out,
--		int(*okfn)(struct sk_buff *))
--#else
--static unsigned int mc_forward_hook(unsigned int hooknum, struct sk_buff *skb,
--		const struct net_device *in, const struct net_device *out,
--		int(*okfn)(struct sk_buff *))
--#endif
- {
- 	struct mc_struct *mc;
- 	struct hlist_head *rhead = NULL;
- 	struct net_bridge_port *port;
--#if (LINUX_VERSION_CODE >= KERNEL_VERSION(4, 3, 0))
- 	struct net_device *in = state->in;
- 	struct net_device *out = state->out;
--#endif
- 
- 	rcu_read_lock();
- 
+ #elif (LINUX_VERSION_CODE >= KERNEL_VERSION(3, 13, 0))
 --- a/mc_netfilter.h
 +++ b/mc_netfilter.h
-@@ -23,21 +23,11 @@ void mc_netfilter_exit(void);
- #include <linux/netfilter.h>
+@@ -24,6 +24,15 @@ void mc_netfilter_exit(void);
  #include <linux/netdevice.h>
  
--#if (LINUX_VERSION_CODE >= KERNEL_VERSION(3, 13, 0))
--unsigned int mc_pre_routing_hook(const struct nf_hook_ops *ops, struct sk_buff *skb,
--				 const struct net_device *in, const struct net_device *out,
--				 int(*okfn)(struct sk_buff *));
+ #if (LINUX_VERSION_CODE >= KERNEL_VERSION(3, 13, 0))
++#if (LINUX_VERSION_CODE >= KERNEL_VERSION(4, 3, 0))
 +unsigned int mc_pre_routing_hook(void *priv,
 +				    struct sk_buff *skb,
 +				    const struct nf_hook_state *state);
- 
--unsigned int mc_forward_hook(const struct nf_hook_ops *ops, struct sk_buff *skb,
--			     const struct net_device *in, const struct net_device *out,
--			     int(*okfn)(struct sk_buff *));
--#else
--unsigned int mc_pre_routing_hook(unsigned int hooknum, struct sk_buff *skb,
--				 const struct net_device *in, const struct net_device *out,
--				 int(*okfn)(struct sk_buff *));
--
--unsigned int mc_forward_hook(unsigned int hooknum, struct sk_buff *skb,
--			     const struct net_device *in, const struct net_device *out,
--			     int(*okfn)(struct sk_buff *));
--#endif
++
 +unsigned int mc_forward_hook(void *priv,
 +				    struct sk_buff *skb,
 +				    const struct nf_hook_state *state);
- #endif
++#else
+ unsigned int mc_pre_routing_hook(const struct nf_hook_ops *ops, struct sk_buff *skb,
+ 				 const struct net_device *in, const struct net_device *out,
+ 				 int(*okfn)(struct sk_buff *));
+@@ -31,6 +40,7 @@ unsigned int mc_pre_routing_hook(const s
+ unsigned int mc_forward_hook(const struct nf_hook_ops *ops, struct sk_buff *skb,
+ 			     const struct net_device *in, const struct net_device *out,
+ 			     int(*okfn)(struct sk_buff *));
++#endif
+ #else
+ unsigned int mc_pre_routing_hook(unsigned int hooknum, struct sk_buff *skb,
+ 				 const struct net_device *in, const struct net_device *out,
 --- a/mc_snooping.c
 +++ b/mc_snooping.c
 @@ -33,7 +33,7 @@

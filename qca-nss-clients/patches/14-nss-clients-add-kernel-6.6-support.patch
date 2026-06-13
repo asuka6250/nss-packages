@@ -8,6 +8,15 @@
  /*
   * nss_bridge_mgr_is_physical_dev()
   *	Check if the device is on physical device.
+@@ -1430,7 +1429,7 @@ static int nss_bridge_mgr_fdb_update_cal
+ 	struct net_device *br_dev = NULL;
+ 	fal_fdb_entry_t entry;
+ 
+-	if (!event->br)
++	if (!event || !event->br || !event->orig_dev || !event->dev)
+ 		return NOTIFY_DONE;
+ 
+ 	br_dev = br_fdb_bridge_dev_get_and_hold(event->br);
 @@ -1598,25 +1597,6 @@ static struct ctl_table nss_bridge_mgr_t
  	{ }
  };

@@ -200,7 +200,7 @@
 +MODULE_INFO(description, "NSS tun6rd offload manager");
 --- a/nss_qdisc/igs/nss_mirred.c
 +++ b/nss_qdisc/igs/nss_mirred.c
-@@ -756,3 +756,4 @@ module_init(nss_mirred_init_module);
+@@ -767,3 +767,4 @@ module_init(nss_mirred_init_module);
  module_exit(nss_mirred_cleanup_module);
  
  MODULE_LICENSE("Dual BSD/GPL");
@@ -215,7 +215,7 @@
  #include <nss_api_if.h>
  #include "nss_qdisc.h"
  #include "nss_fifo.h"
-@@ -2941,3 +2942,4 @@ module_init(nss_qdisc_module_init)
+@@ -2951,3 +2952,4 @@ module_init(nss_qdisc_module_init)
  module_exit(nss_qdisc_module_exit)
  
  MODULE_LICENSE("Dual BSD/GPL");

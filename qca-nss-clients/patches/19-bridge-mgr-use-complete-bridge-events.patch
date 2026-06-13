@@ -1,0 +1,98 @@
+--- a/bridge/nss_bridge_mgr.c
++++ b/bridge/nss_bridge_mgr.c
+@@ -1256,14 +1256,13 @@ static int nss_bridge_mgr_changeaddr_eve
+ 
+ /*
+  * nss_bridge_mgr_changeupper_event()
+- *	Bridge manager handles netdevice joining or leaving bridge notification.
++ *	Bridge manager handles upper device notifications not covered by
++ *	completed bridge join/leave events.
+  */
+ static int nss_bridge_mgr_changeupper_event(struct netdev_notifier_info *info)
+ {
+ 	struct net_device *dev = netdev_notifier_info_to_dev(info);
+-	struct net_device *master_dev;
+ 	struct netdev_notifier_changeupper_info *cu_info;
+-	struct nss_bridge_pvt *b_pvt;
+ 
+ 	cu_info = (struct netdev_notifier_changeupper_info *)info;
+ 
+@@ -1279,39 +1278,57 @@ static int nss_bridge_mgr_changeupper_ev
+ 	if (netif_is_bond_slave(dev))
+ 		return nss_bridge_mgr_bond_slave_changeupper(cu_info, dev);
+ 
+-	master_dev = cu_info->upper_dev;
++	return NOTIFY_DONE;
++}
++
++/*
++ * nss_bridge_mgr_bridge_event()
++ *	Bridge manager handles completed bridge join/leave notifications.
++ */
++static int nss_bridge_mgr_bridge_event(struct netdev_notifier_info *info,
++					unsigned long event)
++{
++	struct net_device *dev = netdev_notifier_info_to_dev(info);
++	struct net_device *master_dev;
++	struct nss_bridge_pvt *b_pvt;
++
++	master_dev = netdev_master_upper_dev_get(dev);
++	if (!master_dev)
++		return NOTIFY_DONE;
+ 
+-	/*
+-	 * Check if upper_dev is a known bridge.
+-	 */
+ 	b_pvt = nss_bridge_mgr_find_instance(master_dev);
+ 	if (!b_pvt)
+ 		return NOTIFY_DONE;
+ 
+ 	/*
+-	 * Slave device is bond master and it is added/removed to/from bridge
++	 * Slave device is bond master and it is added/removed to/from bridge.
+ 	 */
+ 	if (netif_is_bond_master(dev)) {
+ #if defined(NSS_BRIDGE_MGR_PPE_SUPPORT)
+-		if (cu_info->linking)
++		if (event == NETDEV_BR_JOIN)
+ 			return nss_bridge_mgr_bond_master_join(dev, b_pvt);
+ 		else
+ 			return nss_bridge_mgr_bond_master_leave(dev, b_pvt);
+ #endif
++		return NOTIFY_DONE;
+ 	}
+ 
+-	if (cu_info->linking) {
+-		nss_bridge_mgr_trace("%px: Interface %s joining bridge %s\n", b_pvt, dev->name, master_dev->name);
++	if (event == NETDEV_BR_JOIN) {
++		nss_bridge_mgr_trace("%px: Interface %s joining bridge %s\n",
++				b_pvt, dev->name, master_dev->name);
+ 		if (nss_bridge_mgr_join_bridge(dev, b_pvt)) {
+-			nss_bridge_mgr_warn("%px: Interface %s failed to join bridge %s\n", b_pvt, dev->name, master_dev->name);
++			nss_bridge_mgr_warn("%px: Interface %s failed to join bridge %s\n",
++					b_pvt, dev->name, master_dev->name);
+ 		}
+ 
+ 		return NOTIFY_DONE;
+ 	}
+ 
+-	nss_bridge_mgr_trace("%px: Interface %s leaving bridge %s\n", b_pvt, dev->name, master_dev->name);
++	nss_bridge_mgr_trace("%px: Interface %s leaving bridge %s\n",
++			b_pvt, dev->name, master_dev->name);
+ 	if (nss_bridge_mgr_leave_bridge(dev, b_pvt)) {
+-		nss_bridge_mgr_warn("%px: Interface %s failed to leave bridge %s\n", b_pvt, dev->name, master_dev->name);
++		nss_bridge_mgr_warn("%px: Interface %s failed to leave bridge %s\n",
++				b_pvt, dev->name, master_dev->name);
+ 	}
+ 
+ 	return NOTIFY_DONE;
+@@ -1349,6 +1366,9 @@ static int nss_bridge_mgr_netdevice_even
+ 	switch (event) {
+ 	case NETDEV_CHANGEUPPER:
+ 		return nss_bridge_mgr_changeupper_event(info);
++	case NETDEV_BR_JOIN:
++	case NETDEV_BR_LEAVE:
++		return nss_bridge_mgr_bridge_event(info, event);
+ 	case NETDEV_CHANGEADDR:
+ 		return nss_bridge_mgr_changeaddr_event(info);
+ 	case NETDEV_CHANGEMTU:
