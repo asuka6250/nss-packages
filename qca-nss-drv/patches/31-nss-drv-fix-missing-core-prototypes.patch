@@ -304,7 +304,7 @@
   * nss_clmap_log_message_types_str
 --- a/nss_core.c
 +++ b/nss_core.c
-@@ -387,7 +387,7 @@ void nss_core_unregister_subsys_dp(struc
+@@ -406,7 +406,7 @@ void nss_core_unregister_subsys_dp(struc
   * nss_core_handle_nss_status_pkt()
   *	Handle the metadata/status packet.
   */
@@ -313,7 +313,7 @@
  {
  	struct nss_cmn_msg *ncm;
  	uint32_t expected_version = NSS_HLOS_MESSAGE_VERSION;
-@@ -2757,7 +2757,7 @@ static inline bool nss_core_skb_can_reus
+@@ -2776,7 +2776,7 @@ static inline bool nss_core_skb_can_reus
   * NOTE: This function does any necessary reference count dropping, and
   * cleans up the skbuff as if its allocated fresh.
   */

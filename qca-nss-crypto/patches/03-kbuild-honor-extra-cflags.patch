@@ -1,7 +1,40 @@
---- a/Makefile
-+++ b/Makefile
-@@ -1,2 +1,4 @@
- obj-m += $(NSS_CRYPTO_DIR)/src/
- obj-m += $(NSS_CRYPTO_DIR)/tool/
-+
-+subdir-ccflags-y += $(EXTRA_CFLAGS)
+--- a/v1.0/src/Makefile
++++ b/v1.0/src/Makefile
+@@ -9,6 +9,7 @@ ccflags-y += -DCONFIG_NSS_CRYPTO_FORCE_U
+ ccflags-y += -DNSS_CRYPTO_DEBUG_LEVEL=2
+ ccflags-y += -Werror
+ ccflags-y += -DNSS_CRYPTO_BUILD_ID=\"'Build_ID - $(shell date +'%m/%d/%y, %H:%M:%S')'\"
++ccflags-y += $(EXTRA_CFLAGS)
+ 
+ obj-m += $(NSS_CRYPTO_MOD_NAME).o
+ $(NSS_CRYPTO_MOD_NAME)-objs = nss_crypto_if.o
+--- a/v1.0/tool/Makefile
++++ b/v1.0/tool/Makefile
+@@ -20,5 +20,6 @@ $(TOOL_MOD_NAME)-objs = nss_crypto_bench
+ obj ?= .
+ #ccflags-y += -DCONFIG_NSS_CRYPTO_TOOL_DBG
+ ccflags-y += -DNSS_CRYPTO_BUILD_ID=\"'Build_ID - $(shell date +'%m/%d/%y, %H:%M:%S')'\"
++ccflags-y += $(EXTRA_CFLAGS)
+ ccflags-y += -I$(obj)/../include -I$(obj)/../src -I$(obj)/
+ ccflags-y += -Werror
+\ No newline at end of file
+--- a/v2.0/src/Makefile
++++ b/v2.0/src/Makefile
+@@ -8,6 +8,7 @@ NSS_CRYPTO_MOD_NAME=qca-nss-crypto
+ ccflags-y += -DNSS_CRYPTO_DEBUG_LEVEL=2
+ ccflags-y += -Wall -Werror
+ ccflags-y += -DNSS_CRYPTO_BUILD_ID=\"'Build_ID - $(shell date +'%m/%d/%y, %H:%M:%S') SoC=$(SoC)'\"
++ccflags-y += $(EXTRA_CFLAGS)
+ 
+ ifneq (, $(findstring ipq807x, $(SoC)))
+ HAL_DIR=hal/ipq807x
+--- a/v2.0/tool/Makefile
++++ b/v2.0/tool/Makefile
+@@ -6,5 +6,6 @@ $(TOOL_MOD_NAME)-objs = nss_crypto_bench
+ obj ?= .
+ #ccflags-y += -DCONFIG_NSS_CRYPTO_TOOL_DBG
+ ccflags-y += -DNSS_CRYPTO_BUILD_ID=\"'Build_ID - $(shell date +'%m/%d/%y, %H:%M:%S')'\"
++ccflags-y += $(EXTRA_CFLAGS)
+ ccflags-y += -I$(obj)/../include -I$(obj)/../src -I$(obj)/
+ ccflags-y += -Werror
+\ No newline at end of file

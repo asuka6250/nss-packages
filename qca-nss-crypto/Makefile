@@ -17,19 +17,18 @@ include $(INCLUDE_DIR)/kernel.mk
 include $(INCLUDE_DIR)/package.mk
 
 define KernelPackage/qca-nss-crypto
-	SECTION:=kernel
-	CATEGORY:=Kernel modules
-	SUBMENU:=Cryptographic API modules
-	DEPENDS:=@TARGET_qualcommax \
-		+kmod-qca-nss-drv \
-		+@NSS_DRV_CRYPTO_ENABLE \
-		+TARGET_qualcommax_ipq807x:nss-eip-firmware \
-		+TARGET_qualcommax_ipq60xx:nss-eip-firmware
-	TITLE:=Kernel driver for NSS crypto driver
+  SECTION:=kernel
+  CATEGORY:=Kernel modules
+  SUBMENU:=Cryptographic API modules
+  DEPENDS:=@TARGET_qualcommax \
+	   +kmod-qca-nss-drv \
+	   +TARGET_qualcommax_ipq807x:nss-eip-firmware \
+	   +TARGET_qualcommax_ipq60xx:nss-eip-firmware
+  TITLE:=Kernel driver for NSS crypto driver
 ifneq ($(CONFIG_PACKAGE_kmod-qca-nss-crypto),)
-	FILES:=$(PKG_BUILD_DIR)/$(NSS_CRYPTO_DIR)/src/qca-nss-crypto.ko \
+  FILES:=$(PKG_BUILD_DIR)/$(NSS_CRYPTO_DIR)/src/qca-nss-crypto.ko \
 	$(PKG_BUILD_DIR)/$(NSS_CRYPTO_DIR)/tool/qca-nss-crypto-tool.ko
-	AUTOLOAD:=$(call AutoProbe,qca-nss-crypto)
+  AUTOLOAD:=$(call AutoProbe,qca-nss-crypto)
 endif
 endef
 
@@ -38,28 +37,26 @@ This package contains a NSS crypto driver for QCA chipset
 endef
 
 ifneq ($(CONFIG_PACKAGE_kmod-qca-nss-crypto),)
-# v1.0 is for Akronite
-# v2.0 is for Hawkeye/Cypress/Maple
-ifneq (, $(findstring $(CONFIG_TARGET_SUBTARGET), "ipq807x" "ipq60xx" "ipq50xx"))
+NSS_CRYPTO_V2_SUBTARGETS:=ipq807x ipq60xx ipq50xx
+NSS_CRYPTO_SUBTARGET:=$(subst ",,$(CONFIG_TARGET_SUBTARGET))
+
+# v1.0 is for Akronite; v2.0 is for Hawkeye/Cypress/Maple.
+ifneq ($(filter $(NSS_CRYPTO_SUBTARGET),$(NSS_CRYPTO_V2_SUBTARGETS)),)
 NSS_CRYPTO_DIR:=v2.0
 else
 NSS_CRYPTO_DIR:=v1.0
 endif
 
-EXTRA_CFLAGS+= \
+EXTRA_CFLAGS += \
 	-DCONFIG_NSS_DEBUG_LEVEL=4 \
 	-I$(STAGING_DIR)/usr/include/qca-nss-crypto \
 	-I$(STAGING_DIR)/usr/include/qca-nss-drv \
 	-I$(PKG_BUILD_DIR)/$(NSS_CRYPTO_DIR)/include \
 	-I$(PKG_BUILD_DIR)/$(NSS_CRYPTO_DIR)/src
 
-ifeq ($(CONFIG_TARGET_BOARD), "qualcommax")
-	SOC:=$(CONFIG_TARGET_SUBTARGET)
-endif
-
-MAKE_OPTS+= \
+MAKE_OPTS:= \
 	NSS_CRYPTO_DIR=$(NSS_CRYPTO_DIR) \
-	SoC=$(SOC) \
+	SoC=$(NSS_CRYPTO_SUBTARGET)
 
 define Build/InstallDev
 	$(INSTALL_DIR) $(1)/usr/include/qca-nss-crypto
@@ -67,11 +64,10 @@ define Build/InstallDev
 endef
 
 define Build/Compile
-	+$(KERNEL_MAKE) \
+	+$(KERNEL_MAKE) $(PKG_JOBS) \
 		M="$(PKG_BUILD_DIR)" \
 		EXTRA_CFLAGS="$(EXTRA_CFLAGS)" \
 		$(strip $(MAKE_OPTS)) \
-		$(PKG_JOBS) \
 		modules
 endef
 

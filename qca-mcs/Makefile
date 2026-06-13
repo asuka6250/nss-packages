@@ -23,14 +23,15 @@ define KernelPackage/qca-mcs
   URL:=http://www.qca.qualcomm.com
   MAINTAINER:=Qualcomm Atheros, Inc.
   TITLE:=QCA Multicast Snooping Support
-  DEPENDS:=+@KERNEL_IPV6_MROUTE +@KERNEL_IP_MROUTE
+  DEPENDS:=+@KERNEL_IPV6_MROUTE \
+	+@KERNEL_IP_MROUTE
   KCONFIG:=CONFIG_NETFILTER=y
   FILES:=$(PKG_BUILD_DIR)/qca-mcs.ko
   AUTOLOAD:=$(call AutoLoad,41,qca-mcs)
 endef
 
 define KernelPackage/qca-mcs/Description
-  This package installs the IGMP/MLD Snooping Module
+  This package installs the IGMP/MLD Snooping Module.
 endef
 
 QCA_MC_SNOOPING_HEADERS:= \
@@ -39,14 +40,13 @@ QCA_MC_SNOOPING_HEADERS:= \
 
 define Build/InstallDev
 	$(INSTALL_DIR) $(1)/usr/include/qca-mcs
-	$(foreach header_file,$(QCA_MC_SNOOPING_HEADERS), $(CP) $(header_file) $(1)/usr/include/qca-mcs;)
-	$(foreach header_file,$(QCA_MC_SNOOPING_HEADERS), $(CP) $(header_file) $(1)/usr/include/;)
+	$(INSTALL_DATA) $(QCA_MC_SNOOPING_HEADERS) $(1)/usr/include/qca-mcs/
+	$(INSTALL_DATA) $(QCA_MC_SNOOPING_HEADERS) $(1)/usr/include/
 endef
 
-EXTRA_CFLAGS+= -Wno-implicit-fallthrough
+EXTRA_CFLAGS += -Wno-implicit-fallthrough
 
 QCA_MC_SNOOPING_MAKE_OPTS:= \
-	$(KERNEL_MAKE_FLAGS) \
 	CONFIG_SUPPORT_MLD=y \
 	MDIR=$(PKG_BUILD_DIR) \
 	KBUILDPATH=$(LINUX_DIR) \
@@ -54,12 +54,9 @@ QCA_MC_SNOOPING_MAKE_OPTS:= \
 	KERNELRELEASE=$(LINUX_RELEASE)
 
 define Build/Compile
-	+$(MAKE) -C $(LINUX_DIR) \
-		$(KERNEL_MAKE_FLAGS) \
-		$(PKG_JOBS) \
-		KBUILDPATH=$(LINUX_DIR) \
+	+$(KERNEL_MAKE) $(PKG_JOBS) \
 		$(PKG_MAKE_FLAGS) \
-		M=$(PKG_BUILD_DIR) \
+		M="$(PKG_BUILD_DIR)" \
 		EXTRA_CFLAGS="$(EXTRA_CFLAGS)" \
 		$(strip $(QCA_MC_SNOOPING_MAKE_OPTS)) \
 		modules

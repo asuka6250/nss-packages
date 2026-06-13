@@ -1,15 +1,11 @@
 --- a/frontends/nss/ecm_nss_common.h
 +++ b/frontends/nss/ecm_nss_common.h
-@@ -275,11 +275,7 @@ static inline bool ecm_nss_common_igs_ac
- 		/*
- 		 * Check whether ingress qdisc is attached to the egress device or not.
- 		 */
--#if (LINUX_VERSION_CODE < KERNEL_VERSION(4, 15, 0))
--		if (likely(!(to_dev->ingress_cl_list))) {
--#else
+@@ -278,7 +278,7 @@ static inline bool ecm_nss_common_igs_ac
+ #if (LINUX_VERSION_CODE < KERNEL_VERSION(4, 15, 0))
+ 		if (likely(!(to_dev->ingress_cl_list))) {
+ #else
 -		if (likely(!(to_dev->miniq_ingress))) {
--#endif
 +		if (likely(!(to_dev->tcx_ingress))) {
+ #endif
  			dev_put(to_dev);
  			continue;
- 		}
